@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Moxie Lounge &amp; Karaoke — Best Private KTV &amp; Japanese Dining in Arcadia</title>
+<meta name="description" content="Moxie Lounge & Karaoke — private KTV rooms for 2–50 guests, Japanese sushi & yakitori, happy hour $30/person. Open nightly in Arcadia, CA. Kitchen open until 1:30 AM." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Monoton&family=Rubik+Mono+One&family=Inter:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BarOrPub",
+  "name": "Moxie Lounge & Karaoke",
+  "description": "Private KTV karaoke rooms and Japanese restaurant specializing in sushi and yakitori in Arcadia, CA.",
+  "telephone": "+16265258889",
+  "email": "info@moxiekaraoke.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "1205 S Baldwin Avenue #A",
+    "addressLocality": "Arcadia",
+    "addressRegion": "CA",
+    "postalCode": "91007",
+    "addressCountry": "US"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+      "opens": "18:00",
+      "closes": "02:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Saturday","Sunday"],
+      "opens": "15:00",
+      "closes": "02:00"
+    }
+  ],
+  "servesCuisine": ["Japanese","Sushi","Yakitori"],
+  "priceRange": "$$",
+  "sameAs": [
+    "https://instagram.com/moxiekaraoke",
+    "https://tiktok.com/@moxiekaraoke"
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#06030f;
+    --surface:#0e0825;
+    --ink:#ede9ff;
+    --purple:#8b5cf6;
+    --deep:#5b21b6;
+    --indigo:#4f46e5;
+    --neon:#a78bfa;
+    --cyan:#22d3ee;
+    --pink:#e879f9;
+    --gold:#fbbf24;
+    --dim:rgba(237,233,255,.62);
+    --line:rgba(139,92,246,.2);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    font-weight:400;
+    line-height:1.5;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(900px 600px at 15% 10%, rgba(91,33,182,.38), transparent 60%),
+      radial-gradient(800px 600px at 85% 20%, rgba(79,70,229,.28), transparent 60%),
+      radial-gradient(1000px 800px at 50% 110%, rgba(34,211,238,.14), transparent 60%),
+      #06030f;
+  }
+  body::after{
+    content:"";
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px);
+    mix-blend-mode:overlay;
+  }
+
+  /* ── NAV ── */
+  nav.top{
+    position:fixed;top:0;left:0;right:0;z-index:200;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;
+    backdrop-filter:blur(16px);
+    background:rgba(6,3,15,.6);
+    border-bottom:1px solid var(--line);
+  }
+  .logo-wrap{cursor:pointer;flex-shrink:0;display:flex;align-items:center}
+  .logo-img{
+    height:36px;width:auto;
+    filter:invert(1) hue-rotate(192deg);
+    mix-blend-mode:screen;
+    transition:filter .25s;
+  }
+  .logo-wrap:hover .logo-img{filter:invert(1) hue-rotate(192deg) drop-shadow(0 0 10px rgba(167,139,250,.8))}
+  .logo-img--footer{height:28px}
+  nav.top ul{list-style:none;display:flex;gap:24px;align-items:center}
+  nav.top a{
+    color:rgba(237,233,255,.75);text-decoration:none;font-size:12px;
+    letter-spacing:2px;text-transform:uppercase;font-weight:500;
+    transition:color .2s,text-shadow .2s;cursor:pointer;
+    padding:4px 0;border-bottom:1.5px solid transparent;
+    transition:all .2s;
+  }
+  nav.top a:hover,nav.top a.nav-active{
+    color:var(--neon);
+    text-shadow:0 0 10px rgba(167,139,250,.8);
+    border-bottom-color:var(--purple);
+  }
+  .nav-toggle{display:none;background:none;border:0;color:var(--ink);font-size:26px;cursor:pointer}
+
+  /* ── PAGES ── */
+  .page{display:none;padding-top:70px;min-height:100vh}
+  .page.active{display:block;animation:pagein .45s ease}
+  @keyframes pagein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  /* ── HERO ── */
+  .hero{
+    min-height:calc(100vh - 70px);
+    position:relative;
+    padding:0;
+  }
+  .hero-stage{
+    min-height:calc(100vh - 70px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:60px 24px;overflow:hidden;
+    isolation:isolate;
+  }
+  .hero-stage::before{
+    content:"";
+    position:absolute;
+    left:50%;top:50%;
+    width:min(92vw, 980px);
+    height:min(78vh, 720px);
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle at center,
+      rgba(6,3,15,.84) 0%,
+      rgba(6,3,15,.62) 34%,
+      rgba(6,3,15,.26) 58%,
+      rgba(6,3,15,0) 76%);
+    filter:blur(14px);
+    pointer-events:none;
+    z-index:0;
+  }
+  /* page content sits above fixed glass (z-index:1) */
+  .page{position:relative;z-index:2}
+  .hero-stage .marquee{
+    position:absolute;top:0;left:0;right:0;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:13px;letter-spacing:6px;
+    color:var(--dim);white-space:nowrap;overflow:hidden;opacity:.5;
+  }
+  .hero-stage .marquee span{display:inline-block;padding-left:100%;animation:slide 28s linear infinite}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+  .hero-logo-wrap,.hero .eyebrow,.hero .sub,.hero .cta{position:relative;z-index:1}
+  .hero-logo-wrap{margin-bottom:32px}
+  .hero-spin-hold{
+    min-height:calc(52vh + clamp(560px, 68vh, 860px));
+    position:relative;
+  }
+  .hero-spin-divider{
+    position:sticky;
+    top:calc(50vh - 25px);
+    z-index:2;
+    margin:0;
+    padding:32px 0;
+  }
+  .hero-spin-divider::before{
+    content:"";
+    position:absolute;
+    left:50%;top:50%;
+    width:min(84vw, 920px);
+    height:1px;
+    transform:translate(-50%,-50%);
+    background:linear-gradient(90deg,
+      rgba(34,211,238,0),
+      rgba(34,211,238,.38) 20%,
+      rgba(167,139,250,.85) 50%,
+      rgba(232,121,249,.36) 80%,
+      rgba(232,121,249,0));
+    box-shadow:
+      0 0 10px rgba(167,139,250,.45),
+      0 0 26px rgba(91,33,182,.28);
+    z-index:-1;
+  }
+  .hero-logo{
+    width:min(440px, 76vw);
+    height:auto;display:block;
+    filter:invert(1) hue-rotate(192deg) drop-shadow(0 0 20px rgba(255,255,255,.18)) drop-shadow(0 0 26px rgba(139,92,246,.62)) drop-shadow(0 0 60px rgba(91,33,182,.4));
+    mix-blend-mode:screen;
+    animation:logopulse 4s ease-in-out infinite;
+  }
+  @keyframes logopulse{
+    0%,100%{filter:invert(1) hue-rotate(192deg) drop-shadow(0 0 18px rgba(255,255,255,.16)) drop-shadow(0 0 24px rgba(139,92,246,.55)) drop-shadow(0 0 52px rgba(91,33,182,.34))}
+    50%{filter:invert(1) hue-rotate(192deg) drop-shadow(0 0 24px rgba(255,255,255,.24)) drop-shadow(0 0 34px rgba(60,26,161,.84)) drop-shadow(0 0 78px rgba(139,92,246,.48))}
+  }
+  .hero .eyebrow{
+    font-family:'Bebas Neue',sans-serif;
+    color:rgba(186,244,255,.98);letter-spacing:8px;font-size:14px;margin-bottom:22px;
+    font-weight:700;
+    text-shadow:0 0 12px rgba(34,211,238,.72),0 0 26px rgba(6,3,15,.95);
+  }
+  .hero h1{
+    font-family:'Monoton',cursive;
+    font-size:clamp(52px,11vw,148px);
+    line-height:.92;letter-spacing:2px;
+    color:var(--ink);
+    text-shadow:0 0 8px #fff,0 0 20px var(--purple),0 0 50px var(--purple),0 0 90px var(--deep);
+    animation:flicker 7s infinite;
+  }
+  .hero h1 .alt{
+    color:var(--neon);
+    text-shadow:0 0 8px #fff,0 0 20px var(--neon),0 0 50px var(--purple),0 0 90px var(--indigo);
+  }
+  @keyframes flicker{
+    0%,19%,21%,23%,25%,54%,56%,100%{opacity:1}
+    20%,24%,55%{opacity:.55}
+  }
+  .hero .sub{
+    margin-top:26px;font-size:14px;color:rgba(237,233,255,.94);letter-spacing:4px;text-transform:uppercase;
+    font-weight:700;
+    text-shadow:0 0 16px rgba(6,3,15,.96),0 0 24px rgba(91,33,182,.28);
+  }
+  .hero .sub span{color:#d8c8ff}
+  .hero .cta{margin-top:44px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+
+  /* ── BUTTONS ── */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:15px 28px;font-size:12px;letter-spacing:3px;
+    text-transform:uppercase;font-weight:700;
+    text-decoration:none;color:var(--ink);
+    border:1.5px solid var(--purple);
+    background:transparent;
+    position:relative;overflow:hidden;
+    transition:all .25s ease;cursor:pointer;
+  }
+  .btn::before{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(120deg,var(--purple),var(--indigo));
+    transform:translateY(100%);transition:transform .3s ease;z-index:-1;
+  }
+  .btn:hover{box-shadow:0 0 28px rgba(139,92,246,.7)}
+  .btn:hover::before{transform:translateY(0)}
+  .btn.ghost{border-color:var(--cyan)}
+  .btn.ghost::before{background:linear-gradient(120deg,var(--cyan),var(--indigo))}
+  .btn.ghost:hover{box-shadow:0 0 28px rgba(34,211,238,.6)}
+
+  /* ── SECTIONS ── */
+  section{padding:90px 24px;position:relative}
+  .wrap{max-width:1200px;margin:0 auto}
+  .eyebrow-tag{
+    display:inline-block;font-family:'Bebas Neue',sans-serif;
+    letter-spacing:6px;font-size:12px;color:var(--cyan);
+    padding:5px 12px;border:1px solid var(--cyan);
+    margin-bottom:16px;text-shadow:0 0 8px rgba(34,211,238,.6);
+  }
+  h2.section-title{
+    font-family:'Rubik Mono One',sans-serif;
+    font-size:clamp(32px,6vw,66px);line-height:1;
+    margin-bottom:18px;letter-spacing:-1px;
+  }
+  h2.section-title .accent{color:var(--purple);text-shadow:0 0 20px rgba(139,92,246,.7)}
+  .section-lead{max-width:720px;color:var(--dim);font-size:16px;margin-bottom:44px}
+  .divider{
+    text-align:center;padding:18px 0;color:var(--purple);
+    font-family:'Monoton',cursive;letter-spacing:12px;font-size:13px;
+    text-shadow:0 0 10px var(--purple);
+  }
+
+  /* ── ABOUT ── */
+  #about .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
+  .about-card{
+    padding:38px;border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(91,33,182,.1),rgba(79,70,229,.05));
+    position:relative;
+  }
+  .about-card::before,.about-card::after{
+    content:"";position:absolute;width:14px;height:14px;border:2px solid var(--purple);
+  }
+  .about-card::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .about-card::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .about-card h3{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;margin-bottom:16px;color:var(--gold)}
+  .about-card p{color:var(--dim);margin-bottom:12px;font-size:15px}
+  .amen-list{list-style:none;margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .amen-list li{
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;
+    padding:10px 12px;border:1px solid var(--line);color:var(--ink);
+  }
+  .amen-list li::before{content:"◆ ";color:var(--cyan)}
+
+  /* ── HAPPY HOUR ── */
+  .happy-banner{
+    display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;
+    padding:56px;border:1.5px solid var(--purple);
+    background:linear-gradient(135deg,rgba(91,33,182,.15),rgba(79,70,229,.1));
+    position:relative;overflow:hidden;
+  }
+  .happy-banner::before{
+    content:"HAPPY · HAPPY · HAPPY ·";
+    position:absolute;top:8px;left:0;right:0;
+    font-family:'Monoton',cursive;font-size:11px;letter-spacing:8px;
+    color:rgba(139,92,246,.2);white-space:nowrap;
+  }
+  .price-tag{
+    font-family:'Monoton',cursive;font-size:clamp(78px,14vw,175px);
+    line-height:1;color:var(--gold);
+    text-shadow:0 0 20px rgba(167,139,250,.7),0 0 50px rgba(139,92,246,.35);
+  }
+  .price-tag .per{font-size:.22em;color:var(--ink);text-shadow:none;letter-spacing:4px}
+  .happy-details h3{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;margin-bottom:12px}
+  .happy-details p{color:var(--dim);margin-bottom:14px}
+  .schedule{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+  .schedule-row{
+    display:flex;justify-content:space-between;padding:11px 0;
+    border-bottom:1px dashed var(--line);font-size:13px;letter-spacing:2px;text-transform:uppercase;
+  }
+  .schedule-row strong{color:var(--cyan)}
+
+  /* ── VENUE PHOTOS ── */
+  .venue-photo{
+    width:100%;height:100%;
+    object-fit:cover;display:block;
+    border:1px solid var(--line);
+  }
+  .venue-photo-wrap{
+    position:relative;overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .venue-photo-wrap::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(135deg,rgba(91,33,182,.18),rgba(79,70,229,.12));
+  }
+  .room-feature-img{
+    width:100%;height:340px;
+    object-fit:cover;display:block;
+    border:1px solid var(--line);
+    margin-bottom:32px;
+    box-shadow:0 0 40px rgba(139,92,246,.25);
+  }
+
+  /* ── ROOMS ── */
+  .rooms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:36px}
+  .room-card{
+    padding:34px 26px;border:1px solid var(--line);
+    background:rgba(14,8,37,.6);
+    transition:transform .3s,border-color .3s,box-shadow .3s;
+  }
+  .room-card:hover{
+    transform:translateY(-6px);border-color:var(--purple);
+    box-shadow:0 20px 60px rgba(139,92,246,.25);
+  }
+  .room-card .num{
+    font-family:'Monoton',cursive;font-size:52px;color:var(--indigo);
+    text-shadow:0 0 14px rgba(79,70,229,.7);line-height:1;
+  }
+  .room-card h4{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;margin:12px 0 8px}
+  .room-card p{color:var(--dim);font-size:14px;margin-bottom:14px}
+  .room-card .cap{
+    display:inline-block;padding:4px 10px;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+    border:1px solid var(--cyan);color:var(--cyan);
+  }
+
+  /* ── MENU CATEGORY PHOTO ── */
+  .cat-photo{
+    width:100%;height:220px;
+    object-fit:cover;display:block;
+    border:1px solid var(--line);
+    margin-bottom:22px;
+    box-shadow:0 0 30px rgba(91,33,182,.2);
+    position:relative;
+  }
+  .cat-photo-wrap{
+    position:relative;overflow:hidden;
+    border:1px solid var(--line);
+    margin-bottom:22px;
+    box-shadow:0 0 30px rgba(91,33,182,.2);
+  }
+  .cat-photo-wrap img{width:100%;height:500px;object-fit:cover;object-position:center;display:block}
+  .cat-photo-wrap::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(6,3,15,.05) 0%,rgba(6,3,15,.45) 100%);
+  }
+
+  /* ── MENU PAGE ── */
+  .menu-page{padding:90px 24px 60px}
+  .menu-top{text-align:center;margin-bottom:40px}
+  .menu-tabs{display:flex;justify-content:center;gap:8px;margin-bottom:32px;flex-wrap:wrap}
+  .menu-tab{
+    padding:10px 28px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;
+    border:1.5px solid var(--line);background:transparent;color:var(--dim);
+    cursor:pointer;transition:all .2s;
+  }
+  .menu-tab.active,.menu-tab:hover{
+    border-color:var(--purple);color:var(--ink);
+    background:rgba(139,92,246,.12);box-shadow:0 0 16px rgba(139,92,246,.3);
+  }
+  .menu-tab.active{color:var(--neon)}
+  .menu-cats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:36px}
+  .menu-cat{
+    padding:7px 18px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;
+    border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;
+  }
+  .menu-cat.active,.menu-cat:hover{
+    border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.08);
+  }
+  .menu-section{display:none}
+  .menu-section.active{display:block;animation:pagein .35s ease}
+  .menu-category{display:none;animation:pagein .3s ease}
+  .menu-category.active{display:block}
+  .cat-title{
+    font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;
+    color:var(--neon);margin-bottom:6px;
+    text-shadow:0 0 12px rgba(167,139,250,.5);
+  }
+  .cat-note{font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:22px}
+  .menu-items{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;
+    border-top:1px solid var(--line);
+  }
+  .menu-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:13px 16px;border-bottom:1px solid var(--line);
+    transition:background .2s;gap:12px;
+  }
+  .menu-item:hover{background:rgba(139,92,246,.07)}
+  .menu-item:nth-child(odd){border-right:1px solid var(--line)}
+  .item-name{font-size:14px;color:var(--ink);flex:1}
+  .item-name small{display:block;font-size:11px;color:var(--dim);letter-spacing:.5px;margin-top:2px}
+  .item-price{
+    font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--gold);
+    white-space:nowrap;flex-shrink:0;
+  }
+  .raw-notice{
+    margin-top:28px;padding:14px 18px;border:1px solid rgba(232,121,249,.2);
+    font-size:12px;color:var(--dim);letter-spacing:.5px;
+    background:rgba(232,121,249,.04);
+  }
+
+  /* ── RESERVATIONS ── */
+  .reserve-section{
+    background:
+      radial-gradient(500px 300px at 20% 50%,rgba(91,33,182,.22),transparent 70%),
+      radial-gradient(500px 300px at 80% 50%,rgba(79,70,229,.18),transparent 70%);
+    border-top:1px solid var(--line);
+  }
+  .reserve-box{
+    text-align:center;padding:76px 40px;
+    border:2px solid var(--indigo);
+    background:rgba(6,3,15,.7);
+    position:relative;
+  }
+  .reserve-box .mic-big{font-size:76px;margin-bottom:18px;display:block;filter:drop-shadow(0 0 20px var(--purple))}
+  .reserve-box h3{
+    font-family:'Monoton',cursive;
+    font-size:clamp(32px,5vw,58px);line-height:1;
+    color:var(--ink);margin-bottom:18px;
+    text-shadow:0 0 10px var(--indigo),0 0 30px var(--indigo);
+  }
+  .reserve-box p{color:var(--dim);margin-bottom:28px;max-width:600px;margin-left:auto;margin-right:auto}
+
+  /* ── FAQ ── */
+  .faq-list{display:flex;flex-direction:column;gap:12px;margin-top:36px}
+  details.faq{border:1px solid var(--line);padding:20px 24px;background:rgba(14,8,37,.5);cursor:pointer;transition:border-color .2s}
+  details.faq[open]{border-color:var(--purple)}
+  details.faq summary{
+    list-style:none;display:flex;justify-content:space-between;align-items:center;
+    font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;
+  }
+  details.faq summary::-webkit-details-marker{display:none}
+  details.faq summary::after{content:"+";font-size:26px;color:var(--purple);transition:transform .3s;line-height:1}
+  details.faq[open] summary::after{transform:rotate(45deg)}
+  details.faq p{margin-top:12px;color:var(--dim);font-size:14px}
+
+  /* ── CONTACT ── */
+  #contact{border-top:1px solid var(--line)}
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;margin-top:36px}
+  .contact-card{padding:32px 26px;border:1px solid var(--line)}
+  .contact-card .k{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;color:var(--cyan);margin-bottom:12px}
+  .contact-card .v{font-size:17px;line-height:1.6}
+  .contact-card a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--purple)}
+  .contact-card a:hover{color:var(--neon)}
+
+  /* ── FOOTER ── */
+  footer{padding:56px 24px 28px;border-top:1px solid var(--line);background:rgba(0,0,0,.4)}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:22px}
+  .foot-logo{font-family:'Monoton',cursive;font-size:17px;letter-spacing:2px;color:var(--purple);text-shadow:0 0 10px var(--purple)}
+  .socials{display:flex;gap:12px}
+  .socials a{
+    width:40px;height:40px;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink);text-decoration:none;
+    transition:all .2s;border-radius:8px;
+  }
+  .socials a svg{width:20px;height:20px;fill:currentColor;transition:fill .2s}
+  .socials a:hover{border-color:var(--purple);box-shadow:0 0 16px rgba(139,92,246,.5)}
+  .socials a.ig:hover{color:#e1306c}
+  .socials a.tt:hover{color:#69c9d0}
+  .foot-legal{
+    margin-top:18px;padding-top:18px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-size:11px;color:var(--dim);letter-spacing:1px;
+  }
+  .foot-legal a{color:var(--dim);text-decoration:none;margin-right:14px}
+  .foot-legal a:hover{color:var(--cyan)}
+
+  /* ── REVEAL ── */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ════════════════════════
+     NEON MARTINI CANVAS BG
+  ════════════════════════ */
+  .bg3d-wrap{
+    pointer-events:none;
+    position:fixed;inset:0;z-index:1;
+    overflow:hidden;
+    display:none;
+    opacity:1;
+    transition:opacity .35s ease;
+    background:
+      radial-gradient(760px 460px at 34% 38%, rgba(80,220,255,.06), transparent 60%),
+      radial-gradient(900px 640px at 66% 62%, rgba(232,121,249,.07), transparent 68%);
+  }
+  .bg3d-wrap.visible{display:block}
+  .bg3d-wrap::before{
+    content:"";
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at center, rgba(10,5,32,.84) 0%, rgba(2,1,10,0) 62%);
+  }
+  .bg3d-canvas{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    display:block;
+    opacity:.54;
+    filter:
+      drop-shadow(0 0 34px rgba(80,220,255,.08))
+      drop-shadow(0 0 90px rgba(190,90,245,.1));
+  }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:900px){
+    nav.top ul{
+      display:none;position:absolute;top:100%;left:0;right:0;
+      flex-direction:column;padding:18px;
+      background:rgba(6,3,15,.97);border-bottom:1px solid var(--line);
+    }
+    nav.top ul.open{display:flex}
+    .nav-toggle{display:block}
+    #about .grid,.happy-banner,.contact-grid{grid-template-columns:1fr}
+    .rooms-grid{grid-template-columns:1fr}
+    .menu-items{grid-template-columns:1fr}
+    .menu-item:nth-child(odd){border-right:none}
+    .amen-list{grid-template-columns:1fr}
+    section,.menu-page{padding:70px 18px 50px}
+    .happy-banner{padding:30px}
+    .reserve-box{padding:44px 20px}
+    .menu-cats{
+      flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;
+    }
+    .menu-cats::-webkit-scrollbar{display:none}
+    .menu-cat{white-space:nowrap;flex-shrink:0}
+    .menu-tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;-webkit-overflow-scrolling:touch}
+    .menu-tab{white-space:nowrap;flex-shrink:0}
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG filter: removes white bg, inverts dark→white, preserves blue hue -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+  <defs>
+    <filter id="logo-dark" color-interpolation-filters="sRGB" x="0" y="0" width="1" height="1">
+      <!-- Step 1: punch out white — alpha = -3R -3G -3B + 4 (white→transparent, black→opaque) -->
+      <feColorMatrix type="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                -3 -3 -3 0 4"
+        result="bg-removed"/>
+      <!-- Step 2: invert RGB so black text becomes white -->
+      <feComponentTransfer in="bg-removed" result="inverted">
+        <feFuncR type="linear" slope="-1" intercept="1"/>
+        <feFuncG type="linear" slope="-1" intercept="1"/>
+        <feFuncB type="linear" slope="-1" intercept="1"/>
+        <feFuncA type="identity"/>
+      </feComponentTransfer>
+      <!-- Step 3: hue-rotate 180° to restore blue accents (invert turns blue→orange, this brings it back) -->
+      <feColorMatrix type="hueRotate" values="180" in="inverted"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ── FIXED NEON MARTINI BACKGROUND ── -->
+<div class="bg3d-wrap visible" id="bg3dWrap" aria-hidden="true">
+  <canvas class="bg3d-canvas" id="bgNeonMartini"></canvas>
+</div>
+
+<nav class="top">
+  <div class="logo-wrap" data-page="home">
+    <img src="logo.png" alt="Moxie Lounge &amp; Karaoke" class="logo-img">
+  </div>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
+  <ul id="navlinks">
+    <li><a data-page="home">Home</a></li>
+    <li><a data-page="happy-hour">Happy Hour</a></li>
+    <li><a data-page="rooms">Room Rates</a></li>
+    <li><a data-page="menu">Menu</a></li>
+    <li><a data-page="reservations">Reservations</a></li>
+    <li><a data-page="faq">FAQ</a></li>
+  </ul>
+</nav>
+
+<!-- ════════════════════════════════
+     PAGE: HOME
+════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <section class="hero" id="home">
+    <div class="hero-stage" id="homeStage">
+      <!-- 3D background objects — rotate on scroll -->
+      <div class="marquee"><span>karaoke · sushi yakitori · restaurant with karaoke · arcadia · karaoke · sushi yakitori · restaurant with karaoke · arcadia · karaoke · sushi yakitori · restaurant with karaoke · arcadia ·</span></div>
+      <div class="hero-logo-wrap">
+        <img src="logo.png" alt="Moxie Lounge &amp; Karaoke" class="hero-logo">
+      </div>
+      <div class="eyebrow">◆ Best Private KTV &amp; Japanese Dining in Arcadia ◆</div>
+      <div class="sub">Kitchen open <span>LATE</span> · Last orders 1:30 AM</div>
+      <div class="cta">
+        <a class="btn" data-page="reservations" style="cursor:pointer">🎤 Book a Room</a>
+        <a class="btn ghost" data-page="menu" style="cursor:pointer">View the Menu</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="hero-spin-hold" id="heroSpinHold" aria-hidden="true">
+    <div class="divider hero-spin-divider" id="heroSpinDivider">♪ ♫ ♪ ♫ ♪</div>
+  </div>
+
+  <section id="about">
+    <div class="wrap">
+      <div class="grid">
+        <div class="reveal">
+          <span class="eyebrow-tag">OUR PASSION</span>
+          <h2 class="section-title">More than <span class="accent">just karaoke.</span></h2>
+          <p class="section-lead">
+            We are more than just a karaoke venue — we are also a Japanese restaurant
+            specializing in sushi and grills. A spacious dining area and private rooms
+            of various sizes make Moxie the perfect spot for small gatherings, dining,
+            or private parties of up to 50 people.
+          </p>
+          <div class="about-card">
+            <h3>An exciting &amp; joyful karaoke experience</h3>
+            <p>We cater to all preferences — whether you're enjoying a drink or embracing the new wave of sober culture. A more welcoming and balanced environment for everyone.</p>
+            <p>An ideal spot for family gatherings, where guests of all ages can enjoy an unforgettable experience under the neon.</p>
+            <ul class="amen-list">
+              <li>Large Private Rooms</li>
+              <li>Dining Room</li>
+              <li>Karaoke Rooms</li>
+              <li>Lounge Area</li>
+            </ul>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="venue-photo-wrap" style="aspect-ratio:4/3">
+            <img src="moxie dining area.webp" alt="Moxie dining area" class="venue-photo" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ════════════════════════════════
+     PAGE: HAPPY HOUR
+════════════════════════════════ -->
+<div class="page" id="page-happy-hour">
+  <section style="padding:90px 24px">
+    <div class="wrap">
+      <div class="reveal" style="text-align:center;margin-bottom:48px">
+        <span class="eyebrow-tag">HAPPY HOUR SPECIAL</span>
+        <h2 class="section-title">Thirty bucks.<br><span class="accent">Unlimited vibes.</span></h2>
+      </div>
+      <div class="reveal" style="margin-bottom:32px">
+        <div class="venue-photo-wrap" style="height:280px">
+          <img src="moxie bar .webp" alt="Moxie bar" class="venue-photo" loading="lazy">
+        </div>
+      </div>
+      <div class="happy-banner reveal">
+        <div class="price-tag" style="text-align:center">$30<div class="per">PER PERSON</div></div>
+        <div class="happy-details">
+          <h3>HOW IT WORKS</h3>
+          <p>This charge includes complimentary food and drinks valued up to <strong style="color:var(--gold)">$30</strong> from our menu — grab the mic, grab a bite, grab a pour.</p>
+          <div class="schedule">
+            <div class="schedule-row"><span>Monday – Friday</span><strong>6 PM – 8 PM</strong></div>
+            <div class="schedule-row"><span>Saturday – Sunday</span><strong>3 PM – 7 PM</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════
+     PAGE: ROOMS
+════════════════════════════════ -->
+<div class="page" id="page-rooms">
+  <section style="padding:90px 24px">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow-tag">ROOM RATES</span>
+        <h2 class="section-title">Pick your <span class="accent">stage.</span></h2>
+        <p class="section-lead">From intimate booths to full-blown private parties, every room is wired for sound and ready to glow. The dining area can be converted into a VIP karaoke room upon request, accommodating up to 50 people.</p>
+      </div>
+      <div class="reveal">
+        <img src="moxie room1.webp" alt="Moxie karaoke room" class="room-feature-img" loading="lazy">
+      </div>
+      <div class="rooms-grid">
+        <div class="room-card reveal">
+          <div class="num">01</div>
+          <h4>THE BOOTH</h4>
+          <p>A tight, intimate room for the close crew. Warm up the vocals, split a bottle, own the night.</p>
+          <span class="cap">Up to 8 guests</span>
+        </div>
+        <div class="room-card reveal">
+          <div class="num">02</div>
+          <h4>THE LOUNGE</h4>
+          <p>Midsize room for birthdays, coworkers, and chosen family. Plenty of room to dance between songs.</p>
+          <span class="cap">Up to 20 guests</span>
+        </div>
+        <div class="room-card reveal">
+          <div class="num">03</div>
+          <h4>THE VIP STAGE</h4>
+          <p>The dining floor converts into our largest private karaoke room — the full Moxie experience.</p>
+          <span class="cap">Up to 50 guests</span>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);font-size:12px;color:var(--dim);letter-spacing:1px">
+            To inquire about this space, email us at<br>
+            <a href="mailto:info@moxiekaraoke.com" style="color:var(--neon);text-decoration:none;border-bottom:1px solid var(--purple);margin-top:6px;display:inline-block;letter-spacing:1px">info@moxiekaraoke.com</a>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:36px;padding:28px 24px;border:1px solid var(--line);background:rgba(14,8,37,.5)">
+        <p style="color:var(--dim);font-size:13px;letter-spacing:2px;margin-bottom:16px">
+          📄 Full rate sheet available at the door &nbsp;·&nbsp; Reservations recommended for weekends
+        </p>
+        <p style="color:var(--dim);font-size:13px;margin-bottom:18px">
+          For current room rates, minimum spends, or large-group inquiries:
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+          <a href="tel:6265258889" class="btn" style="font-size:12px">📞 Call 626-525-8889</a>
+          <a href="mailto:info@moxiekaraoke.com" class="btn ghost" style="font-size:12px">✉ Email Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════
+     PAGE: MENU
+════════════════════════════════ -->
+<div class="page" id="page-menu">
+  <div class="menu-page">
+    <div class="wrap">
+
+      <div class="menu-top">
+        <span class="eyebrow-tag">FOOD &amp; DRINKS</span>
+        <h2 class="section-title">Sushi. Yakitori. <span class="accent">Late-night fuel.</span></h2>
+        <p style="color:var(--dim);max-width:600px;margin:0 auto 32px;font-size:15px">
+          A Japanese kitchen firing long after the last curtain call. Last orders at 1:30 AM every night.
+        </p>
+      </div>
+
+      <!-- Top-level: Food / Drinks -->
+      <div class="menu-tabs">
+        <button class="menu-tab active" data-section="food">🍱 Food</button>
+        <button class="menu-tab" data-section="drinks">🍶 Drinks</button>
+      </div>
+
+      <!-- ── FOOD ── -->
+      <div class="menu-section active" id="msec-food">
+        <div class="menu-cats">
+          <button class="menu-cat active" data-cat="appetizer">Appetizer</button>
+          <button class="menu-cat" data-cat="share">Share Plates</button>
+          <button class="menu-cat" data-cat="yakitori">Yakitori</button>
+          <button class="menu-cat" data-cat="sashimi">Sashimi</button>
+          <button class="menu-cat" data-cat="main">Main</button>
+          <button class="menu-cat" data-cat="sushi">Sushi Rolls</button>
+          <button class="menu-cat" data-cat="sweets">Sweets</button>
+        </div>
+
+        <!-- Appetizer -->
+        <div class="menu-category active" id="cat-appetizer">
+          <div class="cat-photo-wrap"><img src="edamame.avif" alt="Edamame" loading="lazy"></div>
+          <div class="cat-title">Appetizer</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Miso Soup</span><span class="item-price">$4.50</span></div>
+            <div class="menu-item"><span class="item-name">Edamame</span><span class="item-price">$8.25</span></div>
+            <div class="menu-item"><span class="item-name">Chili Garlic Edamame</span><span class="item-price">$9.75</span></div>
+            <div class="menu-item"><span class="item-name">Spicy Tuna Crispy Toast<small>3 pcs</small></span><span class="item-price">$6.75</span></div>
+            <div class="menu-item"><span class="item-name">Seaweed Salad</span><span class="item-price">$5.50</span></div>
+            <div class="menu-item"><span class="item-name">Takowasa<small>raw octopus w/ wasabi *</small></span><span class="item-price">$9.00</span></div>
+            <div class="menu-item"><span class="item-name">Steamed Clams with Sake</span><span class="item-price">$8.75</span></div>
+            <div class="menu-item"><span class="item-name">Steamed Clams with Miso Soup</span><span class="item-price">$11.25</span></div>
+            <div class="menu-item"><span class="item-name">Baked Green Mussel<small>3 pcs</small></span><span class="item-price">$7.50</span></div>
+          </div>
+        </div>
+
+        <!-- Share Plates -->
+        <div class="menu-category" id="cat-share">
+          <div class="cat-photo-wrap"><img src="takoyaki.avif" alt="Takoyaki" loading="lazy"></div>
+          <div class="cat-title">Share Plates</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Shrimp Tempura w/ Okonomi Sauce<small>8 pcs</small></span><span class="item-price">$8.95</span></div>
+            <div class="menu-item"><span class="item-name">Egg Roll<small>4 pcs</small></span><span class="item-price">$6.50</span></div>
+            <div class="menu-item"><span class="item-name">Mozzarella Sticks<small>6 pcs</small></span><span class="item-price">$6.95</span></div>
+            <div class="menu-item"><span class="item-name">Truffle French Fries</span><span class="item-price">$8.50</span></div>
+            <div class="menu-item"><span class="item-name">French Fries</span><span class="item-price">$7.75</span></div>
+            <div class="menu-item"><span class="item-name">Tater Tots</span><span class="item-price">$7.75</span></div>
+            <div class="menu-item"><span class="item-name">Veggie Croquettes</span><span class="item-price">$6.50</span></div>
+            <div class="menu-item"><span class="item-name">Fried Shrimp Shu Mai<small>8 pcs</small></span><span class="item-price">$6.75</span></div>
+            <div class="menu-item"><span class="item-name">Kurobuta Pork Gyoza<small>5 pcs</small></span><span class="item-price">$6.75</span></div>
+            <div class="menu-item"><span class="item-name">Chicken Karaage</span><span class="item-price">$12.50</span></div>
+            <div class="menu-item"><span class="item-name">Fried Aji<small>Horse Mackerel, 3 pcs</small></span><span class="item-price">$6.75</span></div>
+            <div class="menu-item"><span class="item-name">Takoyaki<small>6 pcs</small></span><span class="item-price">$7.95</span></div>
+            <div class="menu-item"><span class="item-name">Fried Oyster<small>Large Size, 5 pcs</small></span><span class="item-price">$8.95</span></div>
+            <div class="menu-item"><span class="item-name">Crispy Chicken Skin Roll</span><span class="item-price">$8.75</span></div>
+            <div class="menu-item"><span class="item-name">Fried Pork Rinds Chips</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Spicy Fried Pork Rinds Chips</span><span class="item-price">$5.25</span></div>
+          </div>
+        </div>
+
+        <!-- Yakitori -->
+        <div class="menu-category" id="cat-yakitori">
+          <div class="cat-photo-wrap"><img src="pork jowl.avif" alt="Pork Jowl" loading="lazy"></div>
+          <div class="cat-title">Yakitori</div>
+          <div class="cat-note">Grilled skewers — priced per skewer unless noted</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Grilled Chicken Thigh</span><span class="item-price">$3.50</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Chicken Meatball</span><span class="item-price">$3.00</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Organic Chicken Gizzard</span><span class="item-price">$3.25</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Organic Chicken Heart</span><span class="item-price">$3.25</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Organic Chicken Liver</span><span class="item-price">$3.25</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Chicken Wings<small>2 pcs</small></span><span class="item-price">$5.95</span></div>
+            <div class="menu-item"><span class="item-name">Chicken Skin</span><span class="item-price">$3.00</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Hanger Steak</span><span class="item-price">$5.95</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Beef Tongue<small>Center Cut</small></span><span class="item-price">$5.00</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Pork Belly</span><span class="item-price">$3.25</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Pork Jowl with Sea Salt</span><span class="item-price">$3.50</span></div>
+            <div class="menu-item"><span class="item-name">Truffle Grilled Pork Belly</span><span class="item-price">$3.50</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Kurobuta Pork Sausage</span><span class="item-price">$3.25</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Shrimp</span><span class="item-price">$3.25</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Corn</span><span class="item-price">$2.75</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Quail Egg</span><span class="item-price">$2.75</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Fish Tofu</span><span class="item-price">$2.75</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Shiitake Mushroom<small>x2</small></span><span class="item-price">$4.95</span></div>
+            <div class="menu-item"><span class="item-name">Grilled Okra<small>x2</small></span><span class="item-price">$4.95</span></div>
+          </div>
+        </div>
+
+        <!-- Sashimi -->
+        <div class="menu-category" id="cat-sashimi">
+          <div class="cat-photo-wrap"><img src="tuna moxie.avif" alt="Sashimi" loading="lazy"></div>
+          <div class="cat-title">Sashimi</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Bluefin Tuna<small>5 pcs *</small></span><span class="item-price">$16.95</span></div>
+            <div class="menu-item"><span class="item-name">Seared Salmon with Truffle Ponzu Sauce<small>5 pcs *</small></span><span class="item-price">$11.95</span></div>
+            <div class="menu-item"><span class="item-name">Seared Yellowtail with Truffle Ponzu Sauce<small>5 pcs *</small></span><span class="item-price">$12.95</span></div>
+          </div>
+        </div>
+
+        <!-- Main -->
+        <div class="menu-category" id="cat-main">
+          <div class="cat-photo-wrap"><img src="moxie ramen.webp" alt="Ramen" loading="lazy"></div>
+          <div class="cat-title">Main</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Sea Urchin Cream Udon<small>w/ Shrimp &amp; Caviar</small></span><span class="item-price">$19.50</span></div>
+            <div class="menu-item"><span class="item-name">Shrimp Tempura Udon<small>w/ Miso Soup</small></span><span class="item-price">$14.50</span></div>
+            <div class="menu-item"><span class="item-name">Curry Shrimp Fried Rice</span><span class="item-price">$17.75</span></div>
+            <div class="menu-item"><span class="item-name">Yuzu Garlic Fried Rice</span><span class="item-price">$14.80</span></div>
+            <div class="menu-item"><span class="item-name">Kimchi Fried Rice</span><span class="item-price">$14.80</span></div>
+            <div class="menu-item"><span class="item-name">Tonkotsu Ramen</span><span class="item-price">$15.50</span></div>
+            <div class="menu-item"><span class="item-name">Spicy Tonkotsu Ramen</span><span class="item-price">$16.75</span></div>
+            <div class="menu-item"><span class="item-name">Inari Age Ramen with Tomato Soup</span><span class="item-price">$15.50</span></div>
+          </div>
+        </div>
+
+        <!-- Sushi Rolls -->
+        <div class="menu-category" id="cat-sushi">
+          <div class="cat-photo-wrap"><img src="moxie california roll.avif" alt="California Roll" loading="lazy"></div>
+          <div class="cat-title">Sushi Rolls</div>
+          <div class="cat-note">All rolls 8 pcs · * consuming raw or undercooked seafood may increase risk of foodborne illness</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">California Roll</span><span class="item-price">$8.00</span></div>
+            <div class="menu-item"><span class="item-name">Spicy Tuna Roll *</span><span class="item-price">$8.50</span></div>
+            <div class="menu-item"><span class="item-name">Salmon &amp; Avocado Roll *</span><span class="item-price">$9.00</span></div>
+            <div class="menu-item"><span class="item-name">Salmon &amp; Cucumber Roll *</span><span class="item-price">$9.00</span></div>
+            <div class="menu-item"><span class="item-name">Unagi &amp; Cucumber Roll</span><span class="item-price">$9.00</span></div>
+            <div class="menu-item"><span class="item-name">Shrimp Tempura Roll</span><span class="item-price">$8.00</span></div>
+            <div class="menu-item"><span class="item-name">Spicy California Roll</span><span class="item-price">$9.00</span></div>
+            <div class="menu-item"><span class="item-name">Yellowtail Roll *</span><span class="item-price">$8.00</span></div>
+            <div class="menu-item"><span class="item-name">Crunchy Roll</span><span class="item-price">$9.50</span></div>
+            <div class="menu-item"><span class="item-name">Rainbow Roll *<small>Tuna, Salmon, Yellowtail</small></span><span class="item-price">$16.75</span></div>
+            <div class="menu-item"><span class="item-name">Spicy Tuna California Roll *</span><span class="item-price">$15.50</span></div>
+            <div class="menu-item"><span class="item-name">Spicy Seared Scallop Tempura Roll *</span><span class="item-price">$15.50</span></div>
+            <div class="menu-item"><span class="item-name">Spam, Egg &amp; Avocado Roll</span><span class="item-price">$7.25</span></div>
+            <div class="menu-item"><span class="item-name">Salmon Roll *</span><span class="item-price">$6.25</span></div>
+            <div class="menu-item"><span class="item-name">Spicy Salmon Roll *</span><span class="item-price">$7.25</span></div>
+            <div class="menu-item"><span class="item-name">Vegetable Roll</span><span class="item-price">$7.50</span></div>
+            <div class="menu-item"><span class="item-name">Cucumber Roll</span><span class="item-price">$6.00</span></div>
+            <div class="menu-item"><span class="item-name">Bluefin Tuna Roll *</span><span class="item-price">$9.50</span></div>
+            <div class="menu-item"><span class="item-name">Tamagoyaki Roll</span><span class="item-price">$6.25</span></div>
+          </div>
+        </div>
+
+        <!-- Sweets -->
+        <div class="menu-category" id="cat-sweets">
+          <div class="cat-photo-wrap"><img src="warabi mochi.webp" alt="Warabi Mochi" loading="lazy"></div>
+          <div class="cat-title">Sweets</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Warabi Mochi with Black Honey<small>10 pcs</small></span><span class="item-price">$6.75</span></div>
+            <div class="menu-item"><span class="item-name">Matcha Mochi with Black Honey<small>10 pcs</small></span><span class="item-price">$6.75</span></div>
+          </div>
+        </div>
+
+        <div class="raw-notice">
+          * Consuming raw or undercooked meats, poultry, seafood, shellfish, or eggs may increase your risk of foodborne illness. Please notify your server if you have a food allergy. Prices subject to change without prior notice.
+        </div>
+      </div><!-- /msec-food -->
+
+      <!-- ── DRINKS ── -->
+      <div class="menu-section" id="msec-drinks">
+        <div class="menu-cats">
+          <button class="menu-cat active" data-dcat="soju">Korean Soju</button>
+          <button class="menu-cat" data-dcat="makgeolli">Makgeolli</button>
+          <button class="menu-cat" data-dcat="draft">Draft Beer</button>
+          <button class="menu-cat" data-dcat="beer">Beer</button>
+          <button class="menu-cat" data-dcat="sake">Sake</button>
+          <button class="menu-cat" data-dcat="wine">Wine &amp; Cocktails</button>
+          <button class="menu-cat" data-dcat="nonalc">Non-Alcoholic</button>
+        </div>
+
+        <!-- Korean Soju -->
+        <div class="menu-category active" id="dcat-soju">
+          <div class="cat-title">Korean Soju</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Fresh</span><span class="item-price">$16.50</span></div>
+            <div class="menu-item"><span class="item-name">Peach</span><span class="item-price">$16.50</span></div>
+            <div class="menu-item"><span class="item-name">Grapefruit</span><span class="item-price">$16.50</span></div>
+            <div class="menu-item"><span class="item-name">Green Grape</span><span class="item-price">$16.50</span></div>
+            <div class="menu-item"><span class="item-name">Strawberry</span><span class="item-price">$16.50</span></div>
+            <div class="menu-item"><span class="item-name">Lemon</span><span class="item-price">$16.50</span></div>
+            <div class="menu-item"><span class="item-name">Jinro Soju</span><span class="item-price">$18.50</span></div>
+            <div class="menu-item"><span class="item-name">Jinro Zero Sugar Soju</span><span class="item-price">$19.50</span></div>
+            <div class="menu-item"><span class="item-name">Pineapple Soju Cocktail<small>1L</small></span><span class="item-price">$24.50</span></div>
+            <div class="menu-item"><span class="item-name">Original Soju Yogurt Cocktail<small>1L</small></span><span class="item-price">$24.50</span></div>
+            <div class="menu-item"><span class="item-name">Lychee Soju Yogurt Cocktail<small>1L</small></span><span class="item-price">$24.50</span></div>
+            <div class="menu-item"><span class="item-name">Mango Soju Yogurt Cocktail<small>1L</small></span><span class="item-price">$24.50</span></div>
+            <div class="menu-item"><span class="item-name">Redbull Mango Yogurt Soju Cocktail<small>1L</small></span><span class="item-price">$24.50</span></div>
+          </div>
+        </div>
+
+        <!-- Makgeolli -->
+        <div class="menu-category" id="dcat-makgeolli">
+          <div class="cat-title">Korean Makgeolli</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Yuzu Makgeolli<small>1L</small></span><span class="item-price">$17.50</span></div>
+            <div class="menu-item"><span class="item-name">Yoguet Makgeolli<small>1L</small></span><span class="item-price">$17.50</span></div>
+            <div class="menu-item"><span class="item-name">Lychee Yogurt Makgeolli<small>1L</small></span><span class="item-price">$18.50</span></div>
+            <div class="menu-item"><span class="item-name">Mango Yogurt Makgeolli<small>1L</small></span><span class="item-price">$18.50</span></div>
+            <div class="menu-item"><span class="item-name">Strawberry Yogurt Makgeolli<small>1L</small></span><span class="item-price">$18.50</span></div>
+            <div class="menu-item"><span class="item-name">Yuzu Yogurt Makgeolli<small>1L</small></span><span class="item-price">$20.50</span></div>
+          </div>
+        </div>
+
+        <!-- Draft Beer -->
+        <div class="menu-category" id="dcat-draft">
+          <div class="cat-title">Draft Beer</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Sapporo<small>3 Liters</small></span><span class="item-price">$36.50</span></div>
+            <div class="menu-item"><span class="item-name">Asahi<small>3 Liters</small></span><span class="item-price">$38.50</span></div>
+            <div class="menu-item"><span class="item-name">Terra<small>3 Liters</small></span><span class="item-price">$38.50</span></div>
+            <div class="menu-item"><span class="item-name">Orion<small>3 Liters</small></span><span class="item-price">$46.50</span></div>
+            <div class="menu-item"><span class="item-name">Sapporo / Asahi<small>Mug</small></span><span class="item-price">$7.50</span></div>
+            <div class="menu-item"><span class="item-name">Orion<small>Mug</small></span><span class="item-price">$9.50</span></div>
+            <div class="menu-item"><span class="item-name">Sake Bomb</span><span class="item-price">$8.95</span></div>
+          </div>
+        </div>
+
+        <!-- Beer -->
+        <div class="menu-category" id="dcat-beer">
+          <div class="cat-title">Beer</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Bud Lite<small>12oz</small></span><span class="item-price">$5.00</span></div>
+            <div class="menu-item"><span class="item-name">Corona / Heineken / Modelo</span><span class="item-price">$6.00</span></div>
+            <div class="menu-item"><span class="item-name">Terra<small>500ml</small></span><span class="item-price">$9.00</span></div>
+          </div>
+        </div>
+
+        <!-- Sake -->
+        <div class="menu-category" id="dcat-sake">
+          <div class="cat-title">Sake</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Dassai 45<small>720ml</small></span><span class="item-price">$60</span></div>
+            <div class="menu-item"><span class="item-name">Kikisui Junmai Ginjo<small>720ml</small></span><span class="item-price">$48</span></div>
+            <div class="menu-item"><span class="item-name">Kubota Senjyu<small>720ml</small></span><span class="item-price">$48</span></div>
+            <div class="menu-item"><span class="item-name">Sakari no.11 Junmai Daiginjo<small>720ml</small></span><span class="item-price">$52</span></div>
+            <div class="menu-item"><span class="item-name">Sakari no.21 Yuzu Sweet<small>720ml</small></span><span class="item-price">$52</span></div>
+            <div class="menu-item"><span class="item-name">Dassai 23<small>720ml</small></span><span class="item-price">$150</span></div>
+            <div class="menu-item"><span class="item-name">Kubota Manjyu<small>720ml</small></span><span class="item-price">$130</span></div>
+            <div class="menu-item"><span class="item-name">Kikusui Junmai Ginjo<small>300ml</small></span><span class="item-price">$19</span></div>
+            <div class="menu-item"><span class="item-name">Hot Sake</span><span class="item-price">$9.00</span></div>
+          </div>
+        </div>
+
+        <!-- Wine & Cocktails -->
+        <div class="menu-category" id="dcat-wine">
+          <div class="cat-title">Wine &amp; Cocktails</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Stella Rosa Stella Black<small>Bottle</small></span><span class="item-price">$36</span></div>
+            <div class="menu-item"><span class="item-name">Montpellier Cabernet Sauvignon<small>Bottle</small></span><span class="item-price">$38</span></div>
+            <div class="menu-item"><span class="item-name">Montpellier Chardonnay<small>Bottle</small></span><span class="item-price">$38</span></div>
+            <div class="menu-item"><span class="item-name">Yuzu Sake Cocktail</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Cadillac Margarita</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Long Island Iced Tea</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Mojito</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Soju Sunrise</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Pina Colada</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Soju Royal Hawaiian</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Strawberry Margarita</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Peach Sparkling Sake</span><span class="item-price">$13</span></div>
+            <div class="menu-item"><span class="item-name">Grapefruit Sparkling Sake</span><span class="item-price">$13</span></div>
+          </div>
+        </div>
+
+        <!-- Non-Alcoholic -->
+        <div class="menu-category" id="dcat-nonalc">
+          <div class="cat-title">Non-Alcoholic</div>
+          <div class="menu-items">
+            <div class="menu-item"><span class="item-name">Coke / Coke Zero / 7up<small>Can</small></span><span class="item-price">$3.95</span></div>
+            <div class="menu-item"><span class="item-name">Mexicoke Cane Sugar<small>Bottle 355ml</small></span><span class="item-price">$5.50</span></div>
+            <div class="menu-item"><span class="item-name">Bottled Water</span><span class="item-price">$1.95</span></div>
+            <div class="menu-item"><span class="item-name">Ice Lemonade</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Ice Lemon Tea</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Butterfly Tea w/ Honey Lemonade</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Grapefruit w/ Honey</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Herbal Tea w/ Honey</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Red Bull<small>12oz</small></span><span class="item-price">$7.75</span></div>
+            <div class="menu-item"><span class="item-name">Hot Roast Coffee</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Hot Chocolate</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Hot Ginseng Tea</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Pineapple Juice</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Orange Juice</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Grapefruit Juice</span><span class="item-price">$5.25</span></div>
+            <div class="menu-item"><span class="item-name">Cranberry Juice</span><span class="item-price">$5.25</span></div>
+          </div>
+        </div>
+
+      </div><!-- /msec-drinks -->
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     PAGE: RESERVATIONS
+════════════════════════════════ -->
+<div class="page" id="page-reservations">
+  <section style="padding:90px 24px 40px">
+    <div class="wrap" style="text-align:center">
+      <span class="eyebrow-tag">RESERVATIONS</span>
+      <h2 class="section-title">Book your <span class="accent">room.</span></h2>
+      <p style="color:var(--dim);max-width:580px;margin:0 auto 36px;font-size:15px">
+        Weekends fill fast. Lock in your room, gather your people, and let us handle the rest.
+      </p>
+    </div>
+  </section>
+  <div style="width:100%;background:rgba(14,8,37,.6);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <iframe
+      src="https://moxie-lounge-karaoke-arcadia.square.site/s/appointments"
+      title="Book a reservation at Moxie Lounge &amp; Karaoke"
+      style="width:100%;height:800px;border:none;display:block"
+      loading="lazy"
+      allow="payment"
+    ></iframe>
+  </div>
+  <section style="padding:40px 24px 60px">
+    <div class="wrap" style="text-align:center">
+      <p style="color:var(--dim);font-size:13px;letter-spacing:1px">
+        Prefer to call? Reach us at <a href="tel:6265258889" style="color:var(--neon);text-decoration:none;border-bottom:1px solid var(--purple)">626-525-8889</a>
+      </p>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════
+     PAGE: FAQ
+════════════════════════════════ -->
+<div class="page" id="page-faq">
+  <section style="padding:90px 24px">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow-tag">FAQ</span>
+        <h2 class="section-title">Before you <span class="accent">grab the mic.</span></h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq reveal">
+          <summary>What are your hours?</summary>
+          <p>We're open Monday–Friday from 6:00 PM to 2:00 AM, and Saturday–Sunday from 3:00 PM to 2:00 AM. The kitchen stays open late — last orders at 1:30 AM.</p>
+        </details>
+        <details class="faq reveal">
+          <summary>How big are your private rooms?</summary>
+          <p>We offer private rooms of various sizes, accommodating small gatherings all the way up to private parties of 50 people. Our dining area can also be converted into a VIP karaoke room upon request.</p>
+        </details>
+        <details class="faq reveal">
+          <summary>Is Moxie a restaurant too?</summary>
+          <p>Yes — we are more than just a karaoke venue. We are a Japanese restaurant specializing in sushi and grills, with a full food and drinks menu.</p>
+        </details>
+        <details class="faq reveal">
+          <summary>How does the Happy Hour Special work?</summary>
+          <p>It's $30 per person for the entire duration. This charge includes complimentary food and drinks valued up to $30 from our menu. Available Monday–Friday 6 PM–8 PM and Saturday–Sunday 3 PM–7 PM.</p>
+        </details>
+        <details class="faq reveal">
+          <summary>Do I have to drink to have a good time?</summary>
+          <p>Absolutely not. We cater to all preferences — whether you're enjoying a drink or embracing the new wave of sober culture. It's a welcoming and balanced environment for everyone.</p>
+        </details>
+        <details class="faq reveal">
+          <summary>Is Moxie family friendly?</summary>
+          <p>Yes. Moxie is an ideal spot for family gatherings, where guests of all ages can enjoy an unforgettable experience.</p>
+        </details>
+        <details class="faq reveal">
+          <summary>Can I order to-go?</summary>
+          <p>Yes — we're on DoorDash, Uber Eats, and GrubHub for delivery and pickup.</p>
+        </details>
+        <details class="faq reveal">
+          <summary>How do I make a reservation?</summary>
+          <p>Book directly through our <a href="#" data-page="reservations" style="color:var(--neon);border-bottom:1px solid var(--purple);text-decoration:none">Reservations</a> page — you can secure your room online in just a few clicks. You can also call us at <a href="tel:6265258889" style="color:var(--neon);border-bottom:1px solid var(--purple);text-decoration:none">626-525-8889</a> or email <a href="mailto:info@moxiekaraoke.com" style="color:var(--neon);border-bottom:1px solid var(--purple);text-decoration:none">info@moxiekaraoke.com</a>. Weekends book up fast — reserve early!</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="padding:60px 24px 90px">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow-tag">FIND US</span>
+        <h2 class="section-title">Arcadia, <span class="accent">after dark.</span></h2>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card reveal">
+          <div class="k">LOCATION</div>
+          <div class="v">1205 S Baldwin Avenue #A<br>Arcadia, California 91007</div>
+        </div>
+        <div class="contact-card reveal">
+          <div class="k">HOURS</div>
+          <div class="v">Mon – Fri &nbsp;·&nbsp; 6 PM – 2 AM<br>Sat – Sun &nbsp;·&nbsp; 3 PM – 2 AM</div>
+        </div>
+        <div class="contact-card reveal">
+          <div class="k">CALL · EMAIL</div>
+          <div class="v">
+            <a href="tel:6265258889">626-525-8889</a><br>
+            <a href="mailto:info@moxiekaraoke.com">info@moxiekaraoke.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER (always visible) -->
+<footer>
+  <div class="wrap">
+    <div class="foot-logo">
+      <img src="logo.png" alt="Moxie Lounge &amp; Karaoke" class="logo-img logo-img--footer">
+    </div>
+    <div class="socials">
+      <!-- Instagram -->
+      <a class="ig" href="https://instagram.com/moxiekaraoke" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+      </a>
+      <!-- TikTok -->
+      <a class="tt" href="https://tiktok.com/@moxiekaraoke" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.67a8.16 8.16 0 004.77 1.52V6.7a4.85 4.85 0 01-1-.01z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:22px;padding-top:22px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;font-size:12px;letter-spacing:1px;color:var(--dim)">
+    <div>
+      <span style="color:var(--cyan);font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:11px">HOURS</span><br>
+      Mon – Fri &nbsp;·&nbsp; 6 PM – 2 AM<br>
+      Sat – Sun &nbsp;·&nbsp; 3 PM – 2 AM<br>
+      <span style="font-size:11px">Kitchen last orders 1:30 AM</span>
+    </div>
+    <div>
+      <span style="color:var(--cyan);font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:11px">CONTACT</span><br>
+      <a href="tel:6265258889" style="color:var(--ink);text-decoration:none;border-bottom:1px solid var(--purple)">626-525-8889</a><br>
+      <a href="mailto:info@moxiekaraoke.com" style="color:var(--ink);text-decoration:none;border-bottom:1px solid var(--purple)">info@moxiekaraoke.com</a>
+    </div>
+    <div>
+      <span style="color:var(--cyan);font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:11px">LOCATION</span><br>
+      1205 S Baldwin Avenue #A<br>Arcadia, California 91007
+    </div>
+  </div>
+  <div class="wrap foot-legal">
+    <div>Copyright &copy; 2026 Moxie Lounge &amp; Karaoke — All Rights Reserved.</div>
+    <div>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Accessibility Statement</a>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:16px;font-size:11px;color:var(--dim);letter-spacing:1px">
+    Prices on this website may not reflect the most current pricing. The correct prices are those listed on the in-store menu.
+  </div>
+</footer>
+
+<script>
+  // ── SPA PAGE NAVIGATION ──
+  function goToPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pg = document.getElementById('page-' + name);
+    if (pg) { pg.classList.add('active'); window.scrollTo(0, 0); }
+    document.querySelectorAll('[data-page]').forEach(l => l.classList.remove('nav-active'));
+    document.querySelectorAll('[data-page="' + name + '"]').forEach(l => l.classList.add('nav-active'));
+    // re-run reveal for newly shown page
+    document.querySelectorAll('.page.active .reveal').forEach(el => {
+      el.classList.remove('in');
+      setTimeout(() => io.observe(el), 10);
+    });
+    // close mobile nav
+    document.getElementById('navlinks').classList.remove('open');
+  }
+
+  document.querySelectorAll('[data-page]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      goToPage(el.dataset.page);
+    });
+  });
+
+  // ── MENU: FOOD / DRINKS TABS ──
+  document.querySelectorAll('.menu-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('msec-' + tab.dataset.section).classList.add('active');
+    });
+  });
+
+  // ── MENU: FOOD CATEGORY PILLS ──
+  document.querySelectorAll('[data-cat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#msec-food .menu-category').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('cat-' + btn.dataset.cat).classList.add('active');
+    });
+  });
+
+  // ── MENU: DRINKS CATEGORY PILLS ──
+  document.querySelectorAll('[data-dcat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-dcat]').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#msec-drinks .menu-category').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('dcat-' + btn.dataset.dcat).classList.add('active');
+    });
+  });
+
+  // ── NEON MARTINI CANVAS BACKGROUND ──
+  (function(){
+    const wrap = document.getElementById('bg3dWrap');
+    const canvas = document.getElementById('bgNeonMartini');
+    const heroEl = document.getElementById('home');
+    const holdEl = document.getElementById('heroSpinHold');
+    const holdDividerEl = document.getElementById('heroSpinDivider');
+    const aboutEl = document.getElementById('about');
+    if (!wrap || !canvas || !heroEl) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const SEGMENTS = 48;
+    const profile = [
+      { r: 130, y: 120, type: 'rim' },
+      { r: 128, y: 118, type: 'bowl' },
+      { r: 115, y: 95, type: 'bowl' },
+      { r: 95, y: 65, type: 'bowl' },
+      { r: 72, y: 30, type: 'bowl' },
+      { r: 48, y: -5, type: 'bowl' },
+      { r: 25, y: -35, type: 'bowl' },
+      { r: 10, y: -55, type: 'bowl-base' },
+      { r: 6, y: -60, type: 'stem' },
+      { r: 5, y: -90, type: 'stem' },
+      { r: 5, y: -130, type: 'stem' },
+      { r: 6, y: -160, type: 'stem' },
+      { r: 10, y: -165, type: 'foot' },
+      { r: 70, y: -175, type: 'foot' },
+      { r: 75, y: -178, type: 'foot-edge' },
+      { r: 70, y: -181, type: 'foot' }
+    ];
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let cx = 0;
+    let cy = 0;
+    let sceneScale = 1;
+    let depth = 760;
+    let mesh = [];
+    let rotY = 0.26;
+    let targetRotY = 0.26;
+    let rotX = -0.12;
+    let targetRotX = -0.12;
+    let scrollProgress = 0;
+    let scrollTargetProgress = 0;
+    let running = false;
+    let frameId = 0;
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function resizeCanvas() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = wrap.clientWidth || window.innerWidth;
+      height = wrap.clientHeight || window.innerHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const size = Math.min(width, height * 1.14);
+      sceneScale = clamp(size / 600, 0.68, 1.48);
+      depth = 760 * sceneScale;
+      buildMesh();
+      const bounds = getProjectedBounds(rotX, rotY);
+      const verticalOffset = Math.min(height * 0.02, 18);
+      cx = (width / 2) - bounds.midX;
+      cy = (height / 2) - bounds.midY + verticalOffset;
+    }
+
+    function buildMesh() {
+      mesh = profile.map((ringProfile, ringIdx) => {
+        const ring = [];
+        for (let j = 0; j < SEGMENTS; j++) {
+          const a = (j / SEGMENTS) * Math.PI * 2;
+          ring.push({
+            x: Math.cos(a) * ringProfile.r * sceneScale,
+            y: ringProfile.y * sceneScale,
+            z: Math.sin(a) * ringProfile.r * sceneScale,
+            a,
+            type: ringProfile.type,
+            ringIdx
+          });
+        }
+        return ring;
+      });
+    }
+
+    function rotatePoint(point, rx, ry) {
+      const cosX = Math.cos(rx);
+      const sinX = Math.sin(rx);
+      const cosY = Math.cos(ry);
+      const sinY = Math.sin(ry);
+
+      let y = point.y * cosX - point.z * sinX;
+      let z = point.y * sinX + point.z * cosX;
+      let x = point.x * cosY + z * sinY;
+      z = -point.x * sinY + z * cosY;
+
+      return { x, y, z };
+    }
+
+    function project(point) {
+      const perspective = depth / (depth + point.z);
+      return {
+        x: cx + point.x * perspective,
+        y: cy - point.y * perspective,
+        z: point.z,
+        s: perspective
+      };
+    }
+
+    function getProjectedBounds(rx, ry) {
+      let minX = Infinity;
+      let maxX = -Infinity;
+      let minY = Infinity;
+      let maxY = -Infinity;
+
+      for (const ring of mesh) {
+        for (const point of ring) {
+          const rotated = rotatePoint(point, rx, ry);
+          const perspective = depth / (depth + rotated.z);
+          const projectedX = rotated.x * perspective;
+          const projectedY = -rotated.y * perspective;
+          if (projectedX < minX) minX = projectedX;
+          if (projectedX > maxX) maxX = projectedX;
+          if (projectedY < minY) minY = projectedY;
+          if (projectedY > maxY) maxY = projectedY;
+        }
+      }
+
+      return {
+        midX: (minX + maxX) / 2,
+        midY: (minY + maxY) / 2
+      };
+    }
+
+    function getLiquidSurface(now) {
+      const surface = [];
+      const liquidY = 85 * sceneScale;
+      const liquidR = 118 * sceneScale;
+      const swell = Math.sin(now * 0.00115) * 1.6 * sceneScale;
+
+      for (let j = 0; j < SEGMENTS; j++) {
+        const a = (j / SEGMENTS) * Math.PI * 2;
+        const wave1 = Math.sin(a * 3 + now * 0.0022) * 2.2 * sceneScale;
+        const wave2 = Math.cos(a * 5 - now * 0.003) * 1.25 * sceneScale;
+        const wave3 = Math.sin(a * 2 + now * 0.00135) * 0.95 * sceneScale;
+        const wave4 = Math.cos(a * 7 + now * 0.0041) * 0.55 * sceneScale;
+        surface.push({
+          x: Math.cos(a) * liquidR,
+          y: liquidY + swell + wave1 + wave2 + wave3 + wave4,
+          z: Math.sin(a) * liquidR,
+          a
+        });
+      }
+
+      return surface;
+    }
+
+    function getBowlSilhouettePath(tMesh) {
+      const bowlRings = [];
+      for (let i = 0; i < tMesh.length; i++) {
+        const type = tMesh[i][0].type;
+        if (type === 'rim' || type === 'bowl' || type === 'bowl-base') bowlRings.push(tMesh[i]);
+      }
+
+      const leftPts = [];
+      const rightPts = [];
+      for (const ring of bowlRings) {
+        let leftmost = ring[0];
+        let rightmost = ring[0];
+        for (const point of ring) {
+          if (point.x < leftmost.x) leftmost = point;
+          if (point.x > rightmost.x) rightmost = point;
+        }
+        leftPts.push(leftmost);
+        rightPts.push(rightmost);
+      }
+
+      return [...leftPts, ...rightPts.slice().reverse()];
+    }
+
+    function computeAllEdges(tMesh) {
+      const leftEdge = [];
+      const rightEdge = [];
+      for (const ring of tMesh) {
+        let leftmost = ring[0];
+        let rightmost = ring[0];
+        for (let i = 1; i < ring.length; i++) {
+          if (ring[i].x < leftmost.x) leftmost = ring[i];
+          if (ring[i].x > rightmost.x) rightmost = ring[i];
+        }
+        leftEdge.push(leftmost);
+        rightEdge.push(rightmost);
+      }
+      return { leftEdge, rightEdge };
+    }
+
+    function strokePath(points, closed) {
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+      if (closed) ctx.closePath();
+      ctx.stroke();
+    }
+
+    function createNeonGradient(points, alphaBlue, alphaPurple) {
+      let minX = points[0].x;
+      let maxX = points[0].x;
+      for (let i = 1; i < points.length; i++) {
+        if (points[i].x < minX) minX = points[i].x;
+        if (points[i].x > maxX) maxX = points[i].x;
+      }
+      if (Math.abs(maxX - minX) < 1) maxX = minX + 1;
+      const gradient = ctx.createLinearGradient(minX, cy, maxX, cy);
+      gradient.addColorStop(0, `rgba(80, 220, 255, ${alphaBlue})`);
+      gradient.addColorStop(0.5, `rgba(170, 170, 255, ${(alphaBlue + alphaPurple) / 2})`);
+      gradient.addColorStop(1, `rgba(220, 120, 255, ${alphaPurple})`);
+      return gradient;
+    }
+
+    function drawNeonPath(points) {
+      const glowGradient = createNeonGradient(points, 0.42, 0.46);
+      const brightGradient = createNeonGradient(points, 0.86, 0.9);
+      ctx.shadowColor = 'rgba(170, 150, 255, 0.92)';
+      ctx.shadowBlur = 22 * sceneScale;
+      ctx.strokeStyle = glowGradient;
+      ctx.lineWidth = 3 * sceneScale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      strokePath(points, false);
+
+      ctx.shadowBlur = 12 * sceneScale;
+      ctx.strokeStyle = brightGradient;
+      ctx.lineWidth = 1.7 * sceneScale;
+      strokePath(points, false);
+
+      ctx.shadowBlur = 5 * sceneScale;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.98)';
+      ctx.lineWidth = 0.9 * sceneScale;
+      strokePath(points, false);
+
+      ctx.shadowBlur = 0;
+    }
+
+    function drawNeonPathDim(points) {
+      ctx.shadowColor = 'rgba(145, 120, 230, 0.6)';
+      ctx.shadowBlur = 14 * sceneScale;
+      ctx.strokeStyle = createNeonGradient(points, 0.24, 0.42);
+      ctx.lineWidth = 1.5 * sceneScale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      strokePath(points, false);
+      ctx.shadowBlur = 0;
+    }
+
+    function drawNeonRing(ring, half) {
+      const sorted = [...ring].sort((a, b) => a.a - b.a);
+      const type = ring[0].type;
+      const isFront = half === 'front';
+      const alphaBlue = isFront ? 0.66 : 0.18;
+      const alphaPurple = isFront ? 0.74 : 0.34;
+      const blur = isFront ? 10 : 6;
+
+      ctx.shadowColor = isFront ? 'rgba(170, 150, 255, 0.82)' : 'rgba(150, 105, 225, 0.54)';
+      ctx.shadowBlur = blur * sceneScale;
+      ctx.strokeStyle = createNeonGradient(sorted, alphaBlue, alphaPurple);
+      ctx.lineWidth = (type === 'foot-edge' ? 1.9 : 1.1) * sceneScale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      strokePath(sorted, true);
+      ctx.shadowBlur = 0;
+    }
+
+    function drawNeonRim(rim) {
+      const glowGradient = createNeonGradient(rim, 0.46, 0.54);
+      const brightGradient = createNeonGradient(rim, 0.84, 0.94);
+      ctx.shadowColor = 'rgba(175, 155, 255, 1)';
+      ctx.shadowBlur = 26 * sceneScale;
+      ctx.strokeStyle = glowGradient;
+      ctx.lineWidth = 4.5 * sceneScale;
+      strokePath(rim, true);
+
+      ctx.shadowBlur = 14 * sceneScale;
+      ctx.strokeStyle = brightGradient;
+      ctx.lineWidth = 2.1 * sceneScale;
+      strokePath(rim, true);
+
+      ctx.shadowBlur = 5 * sceneScale;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+      ctx.lineWidth = 1 * sceneScale;
+      strokePath(rim, true);
+
+      ctx.shadowBlur = 0;
+    }
+
+    function drawRimHalo(tMesh, now) {
+      const rim = tMesh[0];
+      const pulse = 0.72 + Math.sin(now * 0.003) * 0.28;
+      ctx.shadowColor = `rgba(175, 150, 255, ${pulse})`;
+      ctx.shadowBlur = 36 * sceneScale;
+      ctx.strokeStyle = createNeonGradient(rim, 0.12, 0.16);
+      ctx.lineWidth = 7 * sceneScale;
+      strokePath(rim, true);
+      ctx.shadowBlur = 0;
+    }
+
+    function drawGlassBack(tMesh) {
+      for (const ring of tMesh) {
+        const avgZ = ring.reduce((sum, point) => sum + point.rz, 0) / ring.length;
+        if (avgZ >= 0) continue;
+        const type = ring[0].type;
+        if (type === 'stem' || type === 'foot' || type === 'foot-edge' || type === 'bowl-base') {
+          drawNeonRing(ring, 'back');
+        }
+      }
+
+      const edges = computeAllEdges(tMesh);
+      drawNeonPathDim(edges.leftEdge);
+      drawNeonPathDim(edges.rightEdge);
+    }
+
+    function drawGlassFront(tMesh) {
+      for (const ring of tMesh) {
+        const avgZ = ring.reduce((sum, point) => sum + point.rz, 0) / ring.length;
+        if (avgZ < 0) continue;
+        const type = ring[0].type;
+        if (type === 'stem' || type === 'foot' || type === 'foot-edge' || type === 'bowl-base') {
+          drawNeonRing(ring, 'front');
+        }
+      }
+
+      const edges = computeAllEdges(tMesh);
+      drawNeonPath(edges.leftEdge);
+      drawNeonPath(edges.rightEdge);
+      drawNeonRim(tMesh[0]);
+    }
+
+    function drawLiquidBody(tMesh, now) {
+      const surface = getLiquidSurface(now).map(point => {
+        const rotated = rotatePoint(point, rotX, rotY);
+        return { ...point, ...project(rotated), rz: rotated.z };
+      });
+
+      const bowlRings = tMesh.filter(ring => ring[0].type === 'bowl' && profile[ring[0].ringIdx].y < 85);
+      const allLiquidRings = [surface, ...bowlRings];
+      const bowlBase = tMesh.find(ring => ring[0].type === 'bowl-base');
+      if (bowlBase) allLiquidRings.push(bowlBase);
+
+      for (let i = 0; i < allLiquidRings.length - 1; i++) {
+        const upper = allLiquidRings[i];
+        const lower = allLiquidRings[i + 1];
+        for (let j = 0; j < SEGMENTS; j++) {
+          const next = (j + 1) % SEGMENTS;
+          const p1 = upper[j];
+          const p2 = upper[next];
+          const p3 = lower[next];
+          const p4 = lower[j];
+          const avgZ = (p1.rz + p2.rz + p3.rz + p4.rz) / 4;
+          if (avgZ < 30 * sceneScale) {
+            const depthFactor = clamp((30 * sceneScale - avgZ) / (200 * sceneScale), 0, 1);
+            const depthProgress = i / allLiquidRings.length;
+            const r = Math.floor(150 + depthProgress * 78);
+            const g = Math.floor(96 + depthProgress * 38);
+            const b = Math.floor(245 - depthProgress * 12);
+            const alpha = 0.16 + depthFactor * 0.23;
+            ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.lineTo(p4.x, p4.y);
+            ctx.closePath();
+            ctx.fill();
+          }
+        }
+      }
+
+      const surfaceCenterX = surface.reduce((sum, point) => sum + point.x, 0) / surface.length;
+      const surfaceCenterY = (surface[0].y + (bowlBase ? bowlBase[0].y : surface[0].y + 100 * sceneScale)) / 2;
+
+      const glowGrad = ctx.createRadialGradient(surfaceCenterX, surfaceCenterY, 5, surfaceCenterX, surfaceCenterY, 120 * sceneScale);
+      glowGrad.addColorStop(0, 'rgba(110, 220, 255, 0.28)');
+      glowGrad.addColorStop(0.45, 'rgba(170, 150, 255, 0.24)');
+      glowGrad.addColorStop(0.72, 'rgba(210, 110, 255, 0.18)');
+      glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(
+        surfaceCenterX - 160 * sceneScale,
+        surfaceCenterY - 160 * sceneScale,
+        320 * sceneScale,
+        320 * sceneScale
+      );
+
+      const surfaceGrad = ctx.createLinearGradient(
+        surface[0].x,
+        surface[0].y,
+        surface[Math.floor(SEGMENTS / 2)].x,
+        surface[Math.floor(SEGMENTS / 2)].y
+      );
+      surfaceGrad.addColorStop(0, 'rgba(92, 220, 255, 0.54)');
+      surfaceGrad.addColorStop(0.45, 'rgba(214, 214, 255, 0.66)');
+      surfaceGrad.addColorStop(1, 'rgba(212, 118, 255, 0.58)');
+      ctx.fillStyle = surfaceGrad;
+      ctx.beginPath();
+      ctx.moveTo(surface[0].x, surface[0].y);
+      for (let i = 1; i < surface.length; i++) ctx.lineTo(surface[i].x, surface[i].y);
+      ctx.closePath();
+      ctx.fill();
+
+      for (let k = 0; k < 4; k++) {
+        const offset = (now * 0.00125 + k * 1.55) % (Math.PI * 2);
+        const hx = surfaceCenterX + Math.cos(offset) * 72 * sceneScale;
+        const hy = surface[0].y + Math.sin(offset * 1.2) * 12 * sceneScale;
+        const highlightGrad = ctx.createRadialGradient(hx, hy, 2, hx, hy, 40 * sceneScale);
+        highlightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        highlightGrad.addColorStop(0.4, 'rgba(240, 185, 255, 0.32)');
+        highlightGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = highlightGrad;
+        ctx.beginPath();
+        ctx.moveTo(surface[0].x, surface[0].y);
+        for (let i = 1; i < surface.length; i++) ctx.lineTo(surface[i].x, surface[i].y);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      ctx.shadowColor = 'rgba(228, 170, 255, 0.9)';
+      ctx.shadowBlur = 14 * sceneScale;
+      ctx.strokeStyle = 'rgba(255, 228, 255, 0.92)';
+      ctx.lineWidth = 1.5 * sceneScale;
+      ctx.beginPath();
+      ctx.moveTo(surface[0].x, surface[0].y);
+      for (let i = 1; i < surface.length; i++) ctx.lineTo(surface[i].x, surface[i].y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+      ctx.lineWidth = 0.6 * sceneScale;
+      for (let k = 0; k < 5; k++) {
+        const phase = now * 0.001 + k * 1.35;
+        ctx.beginPath();
+        for (let i = 0; i < SEGMENTS; i++) {
+          const point = surface[i];
+          const wobble = Math.sin(i * 0.68 + phase) * 4.4 * sceneScale;
+          if (i === 0) ctx.moveTo(point.x + wobble, point.y + wobble * 0.3);
+          else ctx.lineTo(point.x + wobble, point.y + wobble * 0.3);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+    }
+
+    function drawScene(now) {
+      ctx.clearRect(0, 0, width, height);
+
+      const floorGrad = ctx.createRadialGradient(cx, cy + 200 * sceneScale, 10, cx, cy + 200 * sceneScale, 320 * sceneScale);
+      floorGrad.addColorStop(0, 'rgba(255, 50, 200, 0.24)');
+      floorGrad.addColorStop(0.38, 'rgba(180, 40, 220, 0.11)');
+      floorGrad.addColorStop(1, 'rgba(100, 20, 180, 0)');
+      ctx.fillStyle = floorGrad;
+      ctx.fillRect(0, cy + 70 * sceneScale, width, 360 * sceneScale);
+
+      const ambientGrad = ctx.createRadialGradient(cx, cy - 30 * sceneScale, 40, cx, cy - 30 * sceneScale, 340 * sceneScale);
+      ambientGrad.addColorStop(0, 'rgba(170, 165, 255, 0.14)');
+      ambientGrad.addColorStop(0.46, 'rgba(158, 74, 235, 0.08)');
+      ambientGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = ambientGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      const sideGlowLeft = ctx.createRadialGradient(cx - 190 * sceneScale, cy - 40 * sceneScale, 20, cx - 190 * sceneScale, cy - 40 * sceneScale, 180 * sceneScale);
+      sideGlowLeft.addColorStop(0, 'rgba(80, 220, 255, 0.12)');
+      sideGlowLeft.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = sideGlowLeft;
+      ctx.fillRect(0, 0, width, height);
+
+      const sideGlowRight = ctx.createRadialGradient(cx + 190 * sceneScale, cy - 10 * sceneScale, 20, cx + 190 * sceneScale, cy - 10 * sceneScale, 180 * sceneScale);
+      sideGlowRight.addColorStop(0, 'rgba(232, 121, 249, 0.12)');
+      sideGlowRight.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = sideGlowRight;
+      ctx.fillRect(0, 0, width, height);
+
+      const tMesh = mesh.map(ring =>
+        ring.map(point => {
+          const rotated = rotatePoint(point, rotX, rotY);
+          return { ...point, ...project(rotated), rz: rotated.z };
+        })
+      );
+
+      drawGlassBack(tMesh);
+
+      ctx.save();
+      const silhouette = getBowlSilhouettePath(tMesh);
+      ctx.beginPath();
+      ctx.moveTo(silhouette[0].x, silhouette[0].y);
+      for (let i = 1; i < silhouette.length; i++) ctx.lineTo(silhouette[i].x, silhouette[i].y);
+      ctx.closePath();
+      ctx.clip();
+      drawLiquidBody(tMesh, now);
+      ctx.restore();
+
+      drawGlassFront(tMesh);
+      drawRimHalo(tMesh, now);
+    }
+
+    function updateTargets(now) {
+      const autoSpin = now * 0.00007;
+      targetRotY = 0.24 + autoSpin + scrollProgress * Math.PI * 2;
+      targetRotX = clamp(-0.14 + scrollProgress * 0.08, -0.26, 0.12);
+    }
+
+    function updateScrollState() {
+      if (!wrap.classList.contains('visible')) return;
+      if (!holdEl) return;
+      const holdRect = holdEl.getBoundingClientRect();
+      const aboutHeight = aboutEl ? aboutEl.offsetHeight : 0;
+      const dividerHeight = holdDividerEl ? holdDividerEl.offsetHeight : 0;
+      const stickyTop = (window.innerHeight / 2) - (dividerHeight / 2);
+      const holdRange = Math.max(holdEl.offsetHeight - dividerHeight - stickyTop, 1);
+      const visualScrolled = Math.max(0, stickyTop - holdRect.top);
+      const totalVisualRange = Math.max(holdRange + aboutHeight * 0.78, 1);
+      const fadeProgress = clamp(visualScrolled / totalVisualRange, 0, 1);
+      scrollTargetProgress = clamp(visualScrolled / holdRange, 0, 1);
+      wrap.style.opacity = fadeProgress > 0.92 ? String(1 - (fadeProgress - 0.92) / 0.08) : '1';
+    }
+
+    function frame(now) {
+      if (!running) return;
+      scrollProgress += (scrollTargetProgress - scrollProgress) * 0.07;
+      updateTargets(now);
+      rotY += (targetRotY - rotY) * 0.06;
+      rotX += (targetRotX - rotX) * 0.06;
+      drawScene(now);
+      frameId = window.requestAnimationFrame(frame);
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      resizeCanvas();
+      updateScrollState();
+      scrollProgress = scrollTargetProgress;
+      frameId = window.requestAnimationFrame(frame);
+    }
+
+    function stop() {
+      running = false;
+      if (frameId) window.cancelAnimationFrame(frameId);
+      frameId = 0;
+      ctx.clearRect(0, 0, width, height);
+    }
+
+    function syncVisibility() {
+      const homePage = document.getElementById('page-home');
+      const isHome = homePage && homePage.classList.contains('active');
+      wrap.classList.toggle('visible', isHome);
+      if (isHome) {
+        wrap.style.opacity = '1';
+        start();
+      } else {
+        stop();
+      }
+    }
+
+    const originalGoToPage = window.goToPage;
+    window.goToPage = function(name) {
+      originalGoToPage(name);
+      syncVisibility();
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('scroll', updateScrollState, { passive: true });
+
+    syncVisibility();
+  })();
+
+  // ── SCROLL REVEAL ──
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
