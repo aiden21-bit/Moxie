@@ -119,7 +119,25 @@
     text-shadow:0 0 10px rgba(167,139,250,.8);
     border-bottom-color:var(--purple);
   }
-  .nav-toggle{display:none;background:none;border:0;color:var(--ink);font-size:26px;cursor:pointer}
+  .nav-toggle{
+    display:none;
+    background:none;
+    border:0;
+    color:var(--ink);
+    font-size:26px;
+    cursor:pointer;
+    padding:6px 10px;
+    border-radius:10px;
+    transition:background .2s ease, box-shadow .2s ease, color .2s ease;
+  }
+  .nav-toggle:hover{color:var(--neon);background:rgba(139,92,246,.12)}
+  .nav-toggle:focus-visible{
+    outline:2px solid var(--cyan);
+    outline-offset:4px;
+    background:rgba(34,211,238,.14);
+    box-shadow:0 0 0 2px rgba(6,3,15,.92),0 0 18px rgba(34,211,238,.5);
+    color:var(--cyan);
+  }
 
   /* ── PAGES ── */
   .page{display:none;padding-top:70px;min-height:100vh}
@@ -160,7 +178,8 @@
     position:absolute;top:0;left:0;right:0;
     font-family:'Bebas Neue',sans-serif;
     font-size:13px;letter-spacing:6px;
-    color:var(--dim);white-space:nowrap;overflow:hidden;opacity:.5;
+    color:rgba(237,233,255,.82);white-space:nowrap;overflow:hidden;opacity:.72;
+    text-shadow:0 0 12px rgba(91,33,182,.2);
   }
   .hero-stage .marquee span{display:inline-block;padding-left:100%;animation:slide 28s linear infinite}
   @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-100%)}}
