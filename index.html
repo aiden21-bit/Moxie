@@ -591,6 +591,13 @@
     justify-content:center;
   }
   .bg3d-wrap.visible{display:flex}
+  .bg3d-wrap::after{
+    content:"";
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse 70% 70% at center, transparent 40%, #000 80%);
+    pointer-events:none;
+    z-index:3;
+  }
   #sushiVideoBg{
     width:52vw;
     height:52vh;
