@@ -1591,6 +1591,15 @@
   const originalGoToPage = window.goToPage;
   window.goToPage = function(name) {
     originalGoToPage.call(this, name);
+    // Show video background only on home page
+    const bg3dWrap = document.getElementById('bg3dWrap');
+    if (bg3dWrap) {
+      if (name === 'home') {
+        bg3dWrap.classList.add('visible');
+      } else {
+        bg3dWrap.classList.remove('visible');
+      }
+    }
     window.dispatchEvent(new CustomEvent('pagechange', { detail: name }));
   };
 </script>
