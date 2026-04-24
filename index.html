@@ -101,7 +101,7 @@
     --line:rgba(139,92,246,.2);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
   body{
     background:var(--bg);
     color:var(--ink);
@@ -179,7 +179,7 @@
   }
 
   /* ── PAGES ── */
-  .page{display:none;padding-top:70px;min-height:100vh}
+  .page{display:none;padding-top:70px;min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always}
   .page.active{display:block;animation:pagein .45s ease}
   @keyframes pagein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
@@ -586,19 +586,19 @@
     pointer-events:none;
     position:fixed;inset:0;z-index:1;
     overflow:hidden;
-    display:none;
     opacity:1;
     transition:opacity .35s ease;
     background:#000;
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:center;
+    padding-top:120px;
   }
   .bg3d-wrap.visible{display:flex}
   #sushiVideoBg{
     position:relative;
-    width:60vw;
-    height:60vh;
+    width:70vw;
+    height:70vh;
     object-fit:contain;
     z-index:2;
   }
@@ -728,6 +728,11 @@
 
   <div class="hero-spin-hold" id="heroSpinHold" aria-hidden="true">
     <div class="divider hero-spin-divider" id="heroSpinDivider">♪ ♫ ♪ ♫ ♪</div>
+  </div>
+
+  <!-- Apple-style animation focus zone -->
+  <div class="animation-focus-zone" style="height:300px;position:relative;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);" aria-hidden="true">
+    <div style="text-align:center;color:rgba(255,255,255,0.5);font-size:14px;letter-spacing:1px;text-transform:uppercase;">Watch the deconstruction</div>
   </div>
 
   <section id="about">
@@ -1450,21 +1455,21 @@
     let lastScrollY = window.scrollY;
     let lastUpdateTime = Date.now();
     let scrollVelocity = 0;
-    let videoPlaybackRate = 1;
-    let targetPlaybackRate = 1;
+    let videoPlaybackRate = 0.5; // Apple-style: start at 0.5x cinematic speed
+    let targetPlaybackRate = 0.5;
     let isScrolling = false;
     let scrollTimeout;
     let animationId = null;
     let lastTimeUpdate = 0;
+    let momentumVelocity = 0;
+    let isDecelerating = false;
 
-    // Smooth scroll-position-to-video-time mapping
+    // Apple-style: Quick trigger within first 300px of scroll
     function calculateScrollProgress() {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (docHeight <= 0) return 0;
-
-      const rawProgress = window.scrollY / docHeight;
-      // Apply easing to scroll progress for smoother video timeline feel
-      return easing.easeInOutCubic(Math.min(rawProgress, 1));
+      const triggerZone = 300; // Complete animation within 300px
+      const scrollProgress = Math.min(window.scrollY / triggerZone, 1);
+      // Apply easing for smoother feel
+      return easing.easeInOutCubic(scrollProgress);
     }
 
     function updateVideoTime() {
@@ -1493,11 +1498,11 @@
       const rawVelocity = scrollDelta / timeDelta;
       scrollVelocity = scrollVelocity * 0.7 + rawVelocity * 0.3;
 
-      // Map scroll velocity to playback rate (0.5x to 2x) with easing
+      // Apple-style: 0.5x base with narrow velocity band (0.35x-0.65x) for cinematic feel
       const absVelocity = Math.abs(scrollVelocity);
-      const easedVelocity = easing.easeOutQuad(Math.min(absVelocity / 2, 1));
-      targetPlaybackRate = 0.6 + easedVelocity * 1.4;
-      targetPlaybackRate = Math.max(0.5, Math.min(2, targetPlaybackRate));
+      const easedVelocity = easing.easeOutQuad(Math.min(absVelocity / 3, 1));
+      targetPlaybackRate = 0.5 + (easedVelocity - 0.5) * 0.3;
+      targetPlaybackRate = Math.max(0.35, Math.min(0.65, targetPlaybackRate));
 
       // Smooth playback rate transition with easing
       const rateDiff = targetPlaybackRate - videoPlaybackRate;
@@ -1513,17 +1518,34 @@
       updateScrollVelocity();
       updateVideoTime();
 
-      // Reset scroll velocity after scroll ends
+      // Apple-style momentum: save velocity and enter deceleration phase
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         isScrolling = false;
+        momentumVelocity = scrollVelocity; // Save current velocity for momentum
+        isDecelerating = true; // Start momentum deceleration
         scrollVelocity = 0;
-        targetPlaybackRate = 1;
       }, 200);
     }
 
-    // Optimized animation loop using RAF for 60fps smoothness
+    // Optimized animation loop with momentum deceleration
     function animationLoop() {
+      // Handle momentum deceleration when scroll stops
+      if (isDecelerating && Math.abs(momentumVelocity) > 0.01) {
+        momentumVelocity *= 0.94; // Exponential decay (6% loss per frame)
+        targetPlaybackRate = 0.5 + (momentumVelocity * 0.15); // Decay toward 0.5x base
+        // Clamp to valid range
+        targetPlaybackRate = Math.max(0.35, Math.min(0.65, targetPlaybackRate));
+        // Apply smooth transition to actual playback rate
+        const rateDiff = targetPlaybackRate - videoPlaybackRate;
+        videoPlaybackRate += rateDiff * 0.12;
+        video.playbackRate = videoPlaybackRate;
+      } else if (isDecelerating) {
+        isDecelerating = false;
+        videoPlaybackRate = 0.5;
+        video.playbackRate = 0.5; // Return to 0.5x cinematic speed
+      }
+
       updateVideoTime();
       animationId = requestAnimationFrame(animationLoop);
     }
