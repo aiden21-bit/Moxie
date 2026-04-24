@@ -605,6 +605,10 @@
     background:#000;
     display:block;
   }
+  @media(max-width:768px){
+    #sushiVideoBg{width:88vw;height:52vw}
+    .bg3d-wrap::after{background:radial-gradient(ellipse 90% 85% at center, transparent 30%, #000 72%)}
+  }
 
   /* ── RESPONSIVE ── */
   @media(max-width:900px){
@@ -1465,6 +1469,18 @@
       isActive = false;
       if (animId) { cancelAnimationFrame(animId); animId = null; }
     }
+
+    // iOS Safari blocks currentTime until video is "unlocked" by touch
+    let iosUnlocked = false;
+    function unlockIOS() {
+      if (iosUnlocked) return;
+      iosUnlocked = true;
+      video.play().then(() => {
+        video.pause();
+        video.currentTime = displayTime;
+      }).catch(() => {});
+    }
+    document.addEventListener('touchstart', unlockIOS, { once: true, passive: true });
 
     window.addEventListener('pagechange', (e) => {
       if (e.detail === 'home') startAnimation();
