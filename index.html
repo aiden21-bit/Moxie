@@ -103,7 +103,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
-    background:var(--bg);
+    background:#000;
     color:var(--ink);
     font-family:'Inter',system-ui,sans-serif;
     font-weight:400;
@@ -111,7 +111,7 @@
     overflow-x:hidden;
     min-height:100vh;
   }
-  body::before{
+  body.home-page::before{
     content:"";
     position:fixed;inset:0;z-index:-2;
     background:
@@ -120,7 +120,7 @@
       radial-gradient(1000px 800px at 50% 110%, rgba(34,211,238,.14), transparent 60%),
       #06030f;
   }
-  body::after{
+  body.home-page::after{
     content:"";
     position:fixed;inset:0;z-index:-1;pointer-events:none;
     background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px);
@@ -1588,17 +1588,17 @@
   const originalGoToPage = window.goToPage;
   window.goToPage = function(name) {
     originalGoToPage.call(this, name);
-    // Show video background only on home page
-    const bg3dWrap = document.getElementById('bg3dWrap');
-    if (bg3dWrap) {
-      if (name === 'home') {
-        bg3dWrap.classList.add('visible');
-      } else {
-        bg3dWrap.classList.remove('visible');
-      }
+    // Toggle home page styling
+    if (name === 'home') {
+      document.body.classList.add('home-page');
+    } else {
+      document.body.classList.remove('home-page');
     }
     window.dispatchEvent(new CustomEvent('pagechange', { detail: name }));
   };
+
+  // Initialize home page class on load
+  document.body.classList.add('home-page');
 </script>
 
 </body>
