@@ -1457,16 +1457,14 @@
     let animationId = null;
     let lastTimeUpdate = 0;
 
-    // Smooth scroll-position-to-video-time mapping - triggers quickly then extends
+    // Smooth scroll-position-to-video-time mapping across entire page
     function calculateScrollProgress() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (docHeight <= 0) return 0;
 
-      // Complete animation within first 40% of page scroll, then stay at 100%
-      const triggerThreshold = docHeight * 0.4;
-      const scrollProgress = Math.min(window.scrollY / triggerThreshold, 1);
+      const rawProgress = window.scrollY / docHeight;
       // Apply easing for smoother video timeline feel
-      return easing.easeInOutCubic(scrollProgress);
+      return easing.easeInOutCubic(Math.min(rawProgress, 1));
     }
 
     function updateVideoTime() {
