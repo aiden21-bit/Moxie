@@ -1433,7 +1433,7 @@
   }, { threshold: .12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // ── PREMIUM SUSHI VIDEO SCROLL SYNC ──
+  // ── PREMIUM SUSHI VIDEO SCROLL SYNC (HOME PAGE ONLY) ──
   (function() {
     const video = document.getElementById('sushiVideoBg');
     if (!video) return;
@@ -1457,6 +1457,12 @@
     let animationId = null;
     let lastTimeUpdate = 0;
 
+    // Check if home page is currently active
+    function isHomePage() {
+      const homePage = document.getElementById('page-home');
+      return homePage && homePage.classList.contains('active');
+    }
+
     // Smooth scroll-position-to-video-time mapping - stretched across full page
     function calculateScrollProgress() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -1469,7 +1475,7 @@
     }
 
     function updateVideoTime() {
-      if (!video.duration) return;
+      if (!video.duration || !isHomePage()) return;
 
       const now = Date.now();
       // Throttle updates to 60fps
@@ -1510,6 +1516,7 @@
     }
 
     function onScroll() {
+      if (!isHomePage()) return;
       isScrolling = true;
       updateScrollVelocity();
       updateVideoTime();
@@ -1534,15 +1541,19 @@
     // Preload and initialize
     video.addEventListener('loadedmetadata', () => {
       video.playbackRate = 1;
-      updateVideoTime();
-      animationLoop();
+      if (isHomePage()) {
+        updateVideoTime();
+        animationLoop();
+      }
     });
 
     // Fallback initialization
     if (video.readyState >= 1) {
       video.playbackRate = 1;
-      updateVideoTime();
-      animationLoop();
+      if (isHomePage()) {
+        updateVideoTime();
+        animationLoop();
+      }
     }
 
     // Cleanup on page unload
