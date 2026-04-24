@@ -1413,47 +1413,96 @@
   }, { threshold: .12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // ── SUSHI VIDEO SCROLL CONTROL ──
+  // ── ADVANCED SUSHI VIDEO SCROLL SYNC ──
   (function() {
     const video = document.getElementById('sushiVideoBg');
-    const heroEl = document.getElementById('home');
-    if (!video || !heroEl) return;
+    if (!video) return;
 
     video.src = 'sushi-bg.mp4';
     video.currentTime = 0;
-    let isPlaying = false;
 
-    function updateVideoOnScroll() {
-      const rect = heroEl.getBoundingClientRect();
-      const heroHeight = heroEl.offsetHeight;
-      const windowHeight = window.innerHeight;
+    let lastScrollY = window.scrollY;
+    let lastTime = Date.now();
+    let scrollVelocity = 0;
+    let videoPlaybackRate = 1;
+    let targetPlaybackRate = 1;
+    let isScrolling = false;
+    let scrollTimeout;
 
-      // Calculate scroll progress: 0 at top, 1 at bottom of hero
-      let scrollProgress = 0;
-      if (rect.top <= 0) {
-        scrollProgress = Math.min(1, Math.abs(rect.top) / (heroHeight - windowHeight));
-      }
-
-      if (video.duration) {
-        const targetTime = scrollProgress * video.duration;
-        video.currentTime = targetTime;
-
-        // Pause video while user is scrubbing
-        if (isPlaying) {
-          video.pause();
-          isPlaying = false;
-        }
-      }
+    // Smooth scroll-position-to-video-time mapping
+    function calculateScrollProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      return docHeight > 0 ? window.scrollY / docHeight : 0;
     }
 
-    window.addEventListener('scroll', updateVideoOnScroll, { passive: true });
-    window.addEventListener('wheel', updateVideoOnScroll, { passive: true });
-    window.addEventListener('touchmove', updateVideoOnScroll, { passive: true });
+    function updateVideoTime() {
+      if (!video.duration) return;
+      const progress = calculateScrollProgress();
+      const targetTime = Math.min(progress * video.duration, video.duration - 0.01);
 
-    // Preload video
+      // Smooth time interpolation to avoid jumps
+      video.currentTime += (targetTime - video.currentTime) * 0.15;
+    }
+
+    function updateScrollVelocity() {
+      const now = Date.now();
+      const timeDelta = Math.max(now - lastTime, 1);
+      const scrollDelta = window.scrollY - lastScrollY;
+
+      // Calculate velocity in pixels/millisecond
+      scrollVelocity = scrollDelta / timeDelta;
+
+      // Map scroll velocity to playback rate (0.5x to 2x)
+      const absVelocity = Math.abs(scrollVelocity);
+      targetPlaybackRate = Math.max(0.5, Math.min(2, 0.5 + absVelocity * 0.2));
+
+      // Smooth playback rate transition
+      videoPlaybackRate += (targetPlaybackRate - videoPlaybackRate) * 0.08;
+      video.playbackRate = videoPlaybackRate;
+
+      lastScrollY = window.scrollY;
+      lastTime = now;
+    }
+
+    function onScroll() {
+      isScrolling = true;
+      updateScrollVelocity();
+      updateVideoTime();
+
+      // Reset scroll velocity after scroll ends
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        scrollVelocity = 0;
+        targetPlaybackRate = 1;
+      }, 150);
+    }
+
+    // Animation loop for smooth updates even when not scrolling
+    function animationFrame() {
+      if (isScrolling) {
+        updateVideoTime();
+      }
+      requestAnimationFrame(animationFrame);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('wheel', onScroll, { passive: true });
+    window.addEventListener('touchmove', onScroll, { passive: true });
+
+    // Preload and initialize
     video.addEventListener('loadedmetadata', () => {
-      updateVideoOnScroll();
+      video.playbackRate = 1;
+      updateVideoTime();
+      animationFrame();
     });
+
+    // Fallback initialization if metadata loads before listener
+    if (video.readyState >= 1) {
+      video.playbackRate = 1;
+      updateVideoTime();
+      animationFrame();
+    }
   })();
 </script>
 
