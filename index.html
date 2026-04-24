@@ -594,7 +594,7 @@
   .bg3d-wrap::after{
     content:"";
     position:absolute;inset:0;
-    background:radial-gradient(ellipse 70% 70% at center, transparent 40%, #000 80%);
+    background:radial-gradient(ellipse 65% 65% at center, transparent 35%, #000 75%);
     pointer-events:none;
     z-index:3;
   }
@@ -602,6 +602,8 @@
     width:52vw;
     height:52vh;
     object-fit:contain;
+    background:#000;
+    display:block;
   }
 
   /* ── RESPONSIVE ── */
@@ -1434,36 +1436,33 @@
 
     let animId = null;
     let isActive = false;
-    let scrollDirty = false;
+    let displayTime = 0;
 
     function computeTargetTime() {
       if (!video.duration) return 0;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (docHeight <= 0) return 0;
-      // Animation completes at 70% of page scroll, then stays at end
       const progress = Math.min(window.scrollY / (docHeight * 0.7), 1);
       return progress * video.duration;
     }
 
-    function update() {
-      animId = null;
+    function rafLoop() {
       if (!isActive) return;
-      if (scrollDirty) {
-        scrollDirty = false;
-        video.currentTime = computeTargetTime();
-      }
-    }
-
-    function onScroll() {
-      if (!isActive) return;
-      scrollDirty = true;
-      if (!animId) animId = requestAnimationFrame(update);
+      const target = computeTargetTime();
+      const diff = target - displayTime;
+      // Cap speed to 1x — video never plays faster than real-time
+      const maxStep = (video.duration || 1) / 60;
+      displayTime += Math.max(-maxStep, Math.min(maxStep, diff));
+      displayTime = Math.max(0, Math.min(video.duration || 0, displayTime));
+      video.currentTime = displayTime;
+      animId = requestAnimationFrame(rafLoop);
     }
 
     function startAnimation() {
       if (isActive) return;
       isActive = true;
-      video.currentTime = computeTargetTime();
+      displayTime = computeTargetTime();
+      animId = requestAnimationFrame(rafLoop);
     }
 
     function stopAnimation() {
@@ -1471,7 +1470,6 @@
       if (animId) { cancelAnimationFrame(animId); animId = null; }
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('pagechange', (e) => {
       if (e.detail === 'home') startAnimation();
       else stopAnimation();
