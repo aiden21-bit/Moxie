@@ -589,11 +589,28 @@
     display:none;
     opacity:1;
     transition:opacity .35s ease;
-    background:
-      radial-gradient(760px 460px at 34% 38%, rgba(80,220,255,.06), transparent 60%),
-      radial-gradient(900px 640px at 66% 62%, rgba(232,121,249,.07), transparent 68%);
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
-  .bg3d-wrap.visible{display:block}
+  .bg3d-wrap.visible{display:flex}
+  #sushiVideoBg{
+    position:relative;
+    width:60vw;
+    height:60vh;
+    object-fit:contain;
+    z-index:2;
+  }
+  #sushiVideoOverlay{
+    position:absolute;
+    bottom:0;right:0;
+    width:40%;
+    height:40%;
+    background:rgba(0,0,0,.25);
+    z-index:3;
+    pointer-events:none;
+  }
   .bg3d-wrap::before{
     content:"";
     position:absolute;inset:0;
@@ -665,7 +682,10 @@
 
 <!-- ── FIXED SUSHI VIDEO BACKGROUND ── -->
 <div class="bg3d-wrap visible" id="bg3dWrap" aria-hidden="true">
-  <video id="sushiVideoBg" style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1" muted playsinline></video>
+  <video id="sushiVideoBg" muted playsinline preload="metadata">
+    <source src="sushi-bg.mp4" type="video/mp4">
+  </video>
+  <div id="sushiVideoOverlay"></div>
 </div>
 
 <nav class="top">
@@ -1413,55 +1433,79 @@
   }, { threshold: .12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // ── ADVANCED SUSHI VIDEO SCROLL SYNC ──
+  // ── PREMIUM SUSHI VIDEO SCROLL SYNC ──
   (function() {
     const video = document.getElementById('sushiVideoBg');
     if (!video) return;
 
-    video.src = 'sushi-bg.mp4';
     video.currentTime = 0;
 
+    // Easing functions for fluid motion
+    const easing = {
+      easeOutQuad: (t) => t * (2 - t),
+      easeInOutCubic: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+      smoothstep: (t) => t * t * (3 - 2 * t)
+    };
+
     let lastScrollY = window.scrollY;
-    let lastTime = Date.now();
+    let lastUpdateTime = Date.now();
     let scrollVelocity = 0;
     let videoPlaybackRate = 1;
     let targetPlaybackRate = 1;
     let isScrolling = false;
     let scrollTimeout;
+    let animationId = null;
+    let lastTimeUpdate = 0;
 
     // Smooth scroll-position-to-video-time mapping
     function calculateScrollProgress() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      return docHeight > 0 ? window.scrollY / docHeight : 0;
+      if (docHeight <= 0) return 0;
+
+      const rawProgress = window.scrollY / docHeight;
+      // Apply easing to scroll progress for smoother video timeline feel
+      return easing.easeInOutCubic(Math.min(rawProgress, 1));
     }
 
     function updateVideoTime() {
       if (!video.duration) return;
+
+      const now = Date.now();
+      // Throttle updates to 60fps
+      if (now - lastTimeUpdate < 16) return;
+      lastTimeUpdate = now;
+
       const progress = calculateScrollProgress();
       const targetTime = Math.min(progress * video.duration, video.duration - 0.01);
 
-      // Smooth time interpolation to avoid jumps
-      video.currentTime += (targetTime - video.currentTime) * 0.15;
+      // Smooth eased interpolation to eliminate jumps
+      const diff = targetTime - video.currentTime;
+      const interpolationSpeed = isScrolling ? 0.18 : 0.08;
+      video.currentTime += diff * easing.smoothstep(Math.min(Math.abs(diff) / 0.5, 1)) * interpolationSpeed;
     }
 
     function updateScrollVelocity() {
       const now = Date.now();
-      const timeDelta = Math.max(now - lastTime, 1);
+      const timeDelta = Math.max(now - lastUpdateTime, 1);
       const scrollDelta = window.scrollY - lastScrollY;
 
-      // Calculate velocity in pixels/millisecond
-      scrollVelocity = scrollDelta / timeDelta;
+      // Calculate velocity with exponential smoothing
+      const rawVelocity = scrollDelta / timeDelta;
+      scrollVelocity = scrollVelocity * 0.7 + rawVelocity * 0.3;
 
-      // Map scroll velocity to playback rate (0.5x to 2x)
+      // Map scroll velocity to playback rate (0.5x to 2x) with easing
       const absVelocity = Math.abs(scrollVelocity);
-      targetPlaybackRate = Math.max(0.5, Math.min(2, 0.5 + absVelocity * 0.2));
+      const easedVelocity = easing.easeOutQuad(Math.min(absVelocity / 2, 1));
+      targetPlaybackRate = 0.6 + easedVelocity * 1.4;
+      targetPlaybackRate = Math.max(0.5, Math.min(2, targetPlaybackRate));
 
-      // Smooth playback rate transition
-      videoPlaybackRate += (targetPlaybackRate - videoPlaybackRate) * 0.08;
+      // Smooth playback rate transition with easing
+      const rateDiff = targetPlaybackRate - videoPlaybackRate;
+      videoPlaybackRate += rateDiff * 0.12;
       video.playbackRate = videoPlaybackRate;
 
       lastScrollY = window.scrollY;
-      lastTime = now;
+      lastUpdateTime = now;
     }
 
     function onScroll() {
@@ -1475,34 +1519,35 @@
         isScrolling = false;
         scrollVelocity = 0;
         targetPlaybackRate = 1;
-      }, 150);
+      }, 200);
     }
 
-    // Animation loop for smooth updates even when not scrolling
-    function animationFrame() {
-      if (isScrolling) {
-        updateVideoTime();
-      }
-      requestAnimationFrame(animationFrame);
+    // Optimized animation loop using RAF for 60fps smoothness
+    function animationLoop() {
+      updateVideoTime();
+      animationId = requestAnimationFrame(animationLoop);
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('wheel', onScroll, { passive: true });
-    window.addEventListener('touchmove', onScroll, { passive: true });
 
     // Preload and initialize
     video.addEventListener('loadedmetadata', () => {
       video.playbackRate = 1;
       updateVideoTime();
-      animationFrame();
+      animationLoop();
     });
 
-    // Fallback initialization if metadata loads before listener
+    // Fallback initialization
     if (video.readyState >= 1) {
       video.playbackRate = 1;
       updateVideoTime();
-      animationFrame();
+      animationLoop();
     }
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (animationId) cancelAnimationFrame(animationId);
+    });
   })();
 </script>
 
