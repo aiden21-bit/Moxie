@@ -585,42 +585,16 @@
   .bg3d-wrap{
     pointer-events:none;
     position:fixed;inset:0;z-index:1;
-    overflow:hidden;
     display:none;
-    opacity:1;
-    transition:opacity .35s ease;
     background:#000;
+    align-items:center;
+    justify-content:center;
   }
-  .bg3d-wrap.visible{display:none}
+  .bg3d-wrap.visible{display:flex}
   #sushiVideoBg{
-    position:relative;
-    width:60vw;
-    height:60vh;
+    width:52vw;
+    height:52vh;
     object-fit:contain;
-    z-index:2;
-  }
-  #sushiVideoOverlay{
-    position:absolute;
-    bottom:0;right:0;
-    width:40%;
-    height:40%;
-    background:rgba(0,0,0,.25);
-    z-index:3;
-    pointer-events:none;
-  }
-  .bg3d-wrap::before{
-    content:"";
-    position:absolute;inset:0;
-    background:radial-gradient(ellipse at center, rgba(10,5,32,.84) 0%, rgba(2,1,10,0) 62%);
-  }
-  .bg3d-canvas{
-    position:absolute;inset:0;
-    width:100%;height:100%;
-    display:block;
-    opacity:.54;
-    filter:
-      drop-shadow(0 0 34px rgba(80,220,255,.08))
-      drop-shadow(0 0 90px rgba(190,90,245,.1));
   }
 
   /* ── RESPONSIVE ── */
@@ -1446,159 +1420,83 @@
   }, { threshold: .12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // ── PREMIUM SUSHI VIDEO SCROLL SYNC (HOME PAGE ONLY) ──
+  // ── SUSHI VIDEO SCROLL SYNC (HOME PAGE ONLY) ──
   (function() {
     const video = document.getElementById('sushiVideoBg');
     if (!video) return;
 
-    video.currentTime = 0;
+    let animId = null;
+    let isActive = false;
+    let scrollDirty = false;
 
-    // Easing functions for fluid motion
-    const easing = {
-      easeOutQuad: (t) => t * (2 - t),
-      easeInOutCubic: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
-      smoothstep: (t) => t * t * (3 - 2 * t)
-    };
-
-    let lastScrollY = window.scrollY;
-    let lastUpdateTime = Date.now();
-    let scrollVelocity = 0;
-    let videoPlaybackRate = 1;
-    let targetPlaybackRate = 1;
-    let isScrolling = false;
-    let scrollTimeout;
-    let animationId = null;
-    let lastTimeUpdate = 0;
-    let isAnimationActive = false;
-
-    // Smooth scroll-position-to-video-time mapping - stretched across full page
-    function calculateScrollProgress() {
+    function computeTargetTime() {
+      if (!video.duration) return 0;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (docHeight <= 0) return 0;
-
-      // Stretch animation across 1.5x the document height for slower progression
-      const rawProgress = window.scrollY / (docHeight * 1.5);
-      return easing.easeInOutCubic(Math.min(rawProgress, 1));
+      // Animation completes at 70% of page scroll, then stays at end
+      const progress = Math.min(window.scrollY / (docHeight * 0.7), 1);
+      return progress * video.duration;
     }
 
-    function updateVideoTime() {
-      if (!video.duration) return;
-
-      const now = Date.now();
-      if (now - lastTimeUpdate < 16) return;
-      lastTimeUpdate = now;
-
-      const progress = calculateScrollProgress();
-      const targetTime = Math.min(progress * video.duration, video.duration - 0.01);
-
-      const diff = targetTime - video.currentTime;
-      const interpolationSpeed = isScrolling ? 0.18 : 0.08;
-      video.currentTime += diff * easing.smoothstep(Math.min(Math.abs(diff) / 0.5, 1)) * interpolationSpeed;
-    }
-
-    function updateScrollVelocity() {
-      const now = Date.now();
-      const timeDelta = Math.max(now - lastUpdateTime, 1);
-      const scrollDelta = window.scrollY - lastScrollY;
-
-      const rawVelocity = scrollDelta / timeDelta;
-      scrollVelocity = scrollVelocity * 0.7 + rawVelocity * 0.3;
-
-      const absVelocity = Math.abs(scrollVelocity);
-      const easedVelocity = easing.easeOutQuad(Math.min(absVelocity / 2, 1));
-      targetPlaybackRate = 0.2 + easedVelocity * 0.3;
-      targetPlaybackRate = Math.max(0.2, Math.min(0.5, targetPlaybackRate));
-
-      const rateDiff = targetPlaybackRate - videoPlaybackRate;
-      videoPlaybackRate += rateDiff * 0.12;
-      video.playbackRate = videoPlaybackRate;
-
-      lastScrollY = window.scrollY;
-      lastUpdateTime = now;
+    function update() {
+      animId = null;
+      if (!isActive) return;
+      if (scrollDirty) {
+        scrollDirty = false;
+        video.currentTime = computeTargetTime();
+      }
     }
 
     function onScroll() {
-      if (!isAnimationActive) return;
-      isScrolling = true;
-      updateScrollVelocity();
-      updateVideoTime();
-
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        isScrolling = false;
-        scrollVelocity = 0;
-        targetPlaybackRate = 1;
-      }, 200);
-    }
-
-    function animationLoop() {
-      if (!isAnimationActive) return;
-      updateVideoTime();
-      animationId = requestAnimationFrame(animationLoop);
+      if (!isActive) return;
+      scrollDirty = true;
+      if (!animId) animId = requestAnimationFrame(update);
     }
 
     function startAnimation() {
-      if (isAnimationActive) return;
-      isAnimationActive = true;
-      updateVideoTime();
-      animationLoop();
+      if (isActive) return;
+      isActive = true;
+      video.currentTime = computeTargetTime();
     }
 
     function stopAnimation() {
-      isAnimationActive = false;
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-      }
+      isActive = false;
+      if (animId) { cancelAnimationFrame(animId); animId = null; }
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
-
-    video.addEventListener('loadedmetadata', () => {
-      video.playbackRate = 1;
-      const homePage = document.getElementById('page-home');
-      if (homePage && homePage.classList.contains('active')) {
-        startAnimation();
-      }
-    });
-
-    if (video.readyState >= 1) {
-      video.playbackRate = 1;
-      const homePage = document.getElementById('page-home');
-      if (homePage && homePage.classList.contains('active')) {
-        startAnimation();
-      }
-    }
-
-    // Hook into page navigation to start/stop animation
     window.addEventListener('pagechange', (e) => {
-      if (e.detail === 'home') {
-        startAnimation();
-      } else {
-        stopAnimation();
-      }
+      if (e.detail === 'home') startAnimation();
+      else stopAnimation();
     });
+    window.addEventListener('beforeunload', stopAnimation);
 
-    window.addEventListener('beforeunload', () => {
-      stopAnimation();
-    });
+    function init() {
+      const homePage = document.getElementById('page-home');
+      if (homePage && homePage.classList.contains('active')) startAnimation();
+    }
+    if (video.readyState >= 1) init();
+    video.addEventListener('loadedmetadata', init);
   })();
 
-  // Emit pagechange event when goToPage is called
-  const originalGoToPage = window.goToPage;
+  // Page navigation: toggle home styling + video visibility
+  const _goToPage = window.goToPage;
   window.goToPage = function(name) {
-    originalGoToPage.call(this, name);
-    // Toggle home page styling
+    _goToPage.call(this, name);
+    const bg = document.getElementById('bg3dWrap');
     if (name === 'home') {
       document.body.classList.add('home-page');
+      if (bg) bg.classList.add('visible');
     } else {
       document.body.classList.remove('home-page');
+      if (bg) bg.classList.remove('visible');
     }
     window.dispatchEvent(new CustomEvent('pagechange', { detail: name }));
   };
 
-  // Initialize home page class on load
+  // Initialize on load (home is default active page)
   document.body.classList.add('home-page');
+  document.getElementById('bg3dWrap').classList.add('visible');
 </script>
 
 </body>
