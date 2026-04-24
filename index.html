@@ -641,6 +641,8 @@
     <li><a data-page="menu">Menu</a></li>
     <li><a data-page="reservations">Reservations</a></li>
     <li><a data-page="faq">FAQ</a></li>
+    <li><a data-page="accessibility">Accessibility</a></li>
+    <li><a data-page="privacy">Privacy</a></li>
   </ul>
 </nav>
 
@@ -656,7 +658,7 @@
       <div class="hero-logo-wrap">
         <img src="logo.png" alt="Moxie Lounge &amp; Karaoke" class="hero-logo">
       </div>
-      <div class="eyebrow">◆ Best Private KTV &amp; Japanese Dining in Arcadia ◆</div>
+      <div class="eyebrow">◆ Best Private Karaoke &amp; Japanese Dining in Arcadia ◆</div>
       <div class="sub">Kitchen open <span>LATE</span> · Last orders 1:30 AM</div>
       <div class="cta">
         <a class="btn" data-page="reservations" style="cursor:pointer">🎤 Book a Room</a>
@@ -1200,6 +1202,61 @@
   </section>
 </div>
 
+<!-- ════════════════════════════════
+     PAGE: ACCESSIBILITY STATEMENT
+════════════════════════════════ -->
+<div class="page" id="page-accessibility">
+  <section style="padding:90px 24px">
+    <div class="wrap" style="max-width:700px">
+      <h2 class="section-title">Accessibility Statement</h2>
+      <div style="margin-top:32px;line-height:1.8;color:var(--text)">
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Our Commitment</h3>
+        <p>Moxie Lounge & Karaoke is committed to ensuring digital accessibility for people with disabilities. We are continually improving the user experience for everyone and applying the relevant accessibility standards to ensure our website is usable for all our patrons.</p>
+
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Conformance Status</h3>
+        <p>We are working towards meeting the Web Content Accessibility Guidelines (WCAG) 2.1 level AA standards. These guidelines outline how to make web content more accessible for individuals with visual, auditory, motor, or cognitive disabilities.</p>
+
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Third-Party Content</h3>
+        <p>Our website may contain links to or content from third-party platforms (such as social media feeds, maps, or reservation systems). While we encourage our partners to provide accessible content, we cannot guarantee the full compliance of these third-party elements.</p>
+
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Assistance & Feedback</h3>
+        <p>If you are having difficulty viewing or navigating the content on this website, or notice any content, feature, or functionality that you believe is not fully accessible to people with disabilities, please contact us:</p>
+        <div style="margin-top:16px;padding:16px;border-left:2px solid var(--neon)">
+          📞 Call us: <a href="tel:6265258889" style="color:var(--neon)">626-525-8889</a><br>
+          ✉ Email us: <a href="mailto:info@moxiekaraoke.com" style="color:var(--neon)">info@moxiekaraoke.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════
+     PAGE: PRIVACY POLICY
+════════════════════════════════ -->
+<div class="page" id="page-privacy">
+  <section style="padding:90px 24px">
+    <div class="wrap" style="max-width:700px">
+      <h2 class="section-title">Privacy Policy</h2>
+      <div style="margin-top:32px;line-height:1.8;color:var(--text)">
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Information Collection</h3>
+        <p>We only collect information you provide, such as your name, phone number, and email, specifically for room reservations and customer service.</p>
+
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Data Usage</h3>
+        <p>Your data is used strictly to confirm bookings and improve your experience at our venue. We do not sell or share your personal information with third parties for marketing purposes.</p>
+
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Your Rights</h3>
+        <p>In accordance with California law (CCPA), you have the right to request access to or deletion of your personal data.</p>
+
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Cookies</h3>
+        <p>We use cookies to ensure our website functions properly and to analyze traffic. By continuing to use our site, you agree to our use of cookies.</p>
+
+        <h3 style="color:var(--neon);margin-top:24px;margin-bottom:12px">Contact Us</h3>
+        <p>For any privacy-related inquiries, please email us at <a href="mailto:info@moxiekaraoke.com" style="color:var(--neon)">info@moxiekaraoke.com</a></p>
+      </div>
+    </div>
+  </section>
+</div>
+
 <!-- FOOTER (always visible) -->
 <footer>
   <div class="wrap">
@@ -1241,8 +1298,8 @@
   <div class="wrap foot-legal">
     <div>Copyright &copy; 2026 Moxie Lounge &amp; Karaoke — All Rights Reserved.</div>
     <div>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Accessibility Statement</a>
+      <a href="#" onclick="goToPage('privacy'); return false;">Privacy Policy</a>
+      <a href="#" onclick="goToPage('accessibility'); return false;">Accessibility Statement</a>
     </div>
   </div>
   <div class="wrap" style="margin-top:16px;font-size:11px;color:var(--dim);letter-spacing:1px">
