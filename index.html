@@ -1493,11 +1493,11 @@
       const rawVelocity = scrollDelta / timeDelta;
       scrollVelocity = scrollVelocity * 0.7 + rawVelocity * 0.3;
 
-      // Map scroll velocity to playback rate (0.5x to 2x) with easing
+      // Map scroll velocity to playback rate - slower cinematic speeds (0.4x to 0.9x)
       const absVelocity = Math.abs(scrollVelocity);
       const easedVelocity = easing.easeOutQuad(Math.min(absVelocity / 2, 1));
-      targetPlaybackRate = 0.6 + easedVelocity * 1.4;
-      targetPlaybackRate = Math.max(0.5, Math.min(2, targetPlaybackRate));
+      targetPlaybackRate = 0.4 + easedVelocity * 0.5;
+      targetPlaybackRate = Math.max(0.4, Math.min(0.9, targetPlaybackRate));
 
       // Smooth playback rate transition with easing
       const rateDiff = targetPlaybackRate - videoPlaybackRate;
