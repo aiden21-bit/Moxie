@@ -3,14 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Moxie Lounge & Karaoke | Arcadia's Premier KTV & Japanese Izakaya</title>
-<meta name="description" content="Discover Arcadia's top private karaoke lounge and Japanese Izakaya. Featuring luxury rooms for up to 50 guests, premium sushi, and our signature Uni Udon. Family-friendly with automatic cotton candy. SB 1524 compliant.">
-<meta name="keywords" content="Arcadia Karaoke, Private KTV Room Los Angeles, Japanese Izakaya Arcadia, 50 Person Party Venue, Uni Udon, Sushi Lounge, Family Friendly Karaoke, World Cup 2026 Viewing Party, SB 1524 Service Charge">
+<title>Moxie Lounge & Karaoke | Arcadia Karaoke, Japanese Restaurant & Lounge</title>
+<meta name="description" content="Moxie Lounge & Karaoke is an Arcadia karaoke lounge and Japanese restaurant serving sushi, yakitori, ramen, cocktails, and private karaoke rooms for small groups up to 50 guests.">
+<meta name="keywords" content="Arcadia karaoke, karaoke Arcadia CA, Japanese restaurant Arcadia, sushi Arcadia, izakaya Arcadia, karaoke lounge, private karaoke room, late night food Arcadia, Moxie Lounge and Karaoke">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://moxiekaraoke.com/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://moxiekaraoke.com/">
-<meta property="og:title" content="Moxie Lounge & Karaoke | Luxury Private Rooms & Fine Dining">
-<meta property="og:description" content="Host your next birthday or corporate event in our 50-person private room. Enjoy premium Japanese cuisine and state-of-the-art karaoke.">
+<meta property="og:title" content="Moxie Lounge & Karaoke | Arcadia Karaoke, Japanese Restaurant & Lounge">
+<meta property="og:description" content="Private karaoke rooms, Japanese food, sushi, yakitori, cocktails, and late-night dining in Arcadia, California.">
 <meta property="og:image" content="https://moxiekaraoke.com/moxie%20bar%20.webp">
+<meta property="og:site_name" content="Moxie Lounge & Karaoke">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Moxie Lounge & Karaoke | Arcadia Karaoke, Japanese Restaurant & Lounge">
+<meta name="twitter:description" content="Private karaoke rooms, Japanese food, sushi, yakitori, cocktails, and late-night dining in Arcadia, California.">
+<meta name="twitter:image" content="https://moxiekaraoke.com/moxie%20bar%20.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Rubik+Mono+One&family=Inter:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -19,9 +27,26 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "EntertainmentBusiness",
-      "@id": "https://moxiekaraoke.com/#organization",
+      "@type": "WebSite",
+      "@id": "https://moxiekaraoke.com/#website",
+      "url": "https://moxiekaraoke.com/",
       "name": "Moxie Lounge & Karaoke",
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": ["Restaurant", "BarOrPub", "EntertainmentBusiness"],
+      "@id": "https://moxiekaraoke.com/#business",
+      "name": "Moxie Lounge & Karaoke",
+      "description": "Arcadia karaoke lounge and Japanese restaurant with sushi, yakitori, ramen, cocktails, and private karaoke rooms for groups up to 50 guests.",
+      "image": [
+        "https://moxiekaraoke.com/moxie%20bar%20.webp",
+        "https://moxiekaraoke.com/moxie%20dining%20area.webp",
+        "https://moxiekaraoke.com/moxie%20room1.webp"
+      ],
+      "logo": "https://moxiekaraoke.com/logo.png",
+      "mainEntityOfPage": {
+        "@id": "https://moxiekaraoke.com/#website"
+      },
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "1205 S Baldwin Ave Unit A",
@@ -36,20 +61,42 @@
         "longitude": "-118.0531"
       },
       "telephone": "+1-626-525-8889",
+      "email": "info@moxiekaraoke.com",
       "url": "https://moxiekaraoke.com/",
       "priceRange": "$$",
-      "servesCuisine": "Japanese, Sushi, Izakaya",
-      "amenityFeature": [
-        "Private Karaoke Rooms",
-        "Large Group Event Venue",
-        "50 Person Party Room",
-        "Automatic Cotton Candy Machine",
-        "Family Friendly Environment",
-        "World Cup 2026 Viewing Available"
+      "servesCuisine": ["Japanese", "Sushi", "Izakaya", "Yakitori", "Ramen"],
+      "menu": "https://moxiekaraoke.com/#page-menu",
+      "acceptsReservations": "True",
+      "sameAs": [
+        "https://instagram.com/moxiekaraoke",
+        "https://tiktok.com/@moxiekaraoke"
+      ],
+      "keywords": [
+        "karaoke Arcadia",
+        "Japanese restaurant Arcadia",
+        "karaoke lounge",
+        "private karaoke rooms",
+        "sushi Arcadia",
+        "late night Japanese food"
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "18:00",
+          "closes": "02:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Saturday", "Sunday"],
+          "opens": "15:00",
+          "closes": "02:00"
+        }
       ]
     },
     {
       "@type": "FAQPage",
+      "@id": "https://moxiekaraoke.com/#faq",
       "mainEntity": [{
         "@type": "Question",
         "name": "What is the maximum room capacity at Moxie Lounge?",
@@ -68,6 +115,7 @@
     },
     {
       "@type": "Menu",
+      "@id": "https://moxiekaraoke.com/#menu",
       "name": "Signature Dishes",
       "hasMenuItem": [
         {
@@ -751,6 +799,7 @@
         <img src="logo.png" alt="Moxie Lounge &amp; Karaoke" class="hero-logo">
       </div>
       <div class="eyebrow">◆ Best Private Karaoke &amp; Japanese Dining in Arcadia ◆</div>
+      <h1>Moxie <span class="alt">Lounge &amp; Karaoke</span></h1>
       <div class="sub">Kitchen open <span>LATE</span> · Last orders 1:30 AM</div>
       <div class="cta">
         <a class="btn" data-page="reservations" style="cursor:pointer">🎤 Book a Room</a>
@@ -1342,6 +1391,9 @@
           </div>
         </div>
       </div>
+      <p class="section-lead reveal" style="max-width:860px;margin-top:28px">
+        Moxie Lounge &amp; Karaoke is an Arcadia karaoke lounge, Japanese restaurant, and late-night dining spot serving sushi, yakitori, ramen, cocktails, and private karaoke rooms for birthdays, group dinners, and celebrations near Pasadena and the San Gabriel Valley.
+      </p>
     </div>
   </section>
 </div>
@@ -1439,10 +1491,8 @@
       1205 S Baldwin Avenue #A<br>Arcadia, California 91007
     </div>
   </div>
-  <!-- Hidden SEO Text -->
-  <div style="display:none;" aria-hidden="true">
-    <h2>Best Private Karaoke and Japanese Restaurant in Arcadia</h2>
-    <p>Searching for a private karaoke room for 50 people in Los Angeles or Arcadia? Moxie Lounge & Karaoke offers the ultimate venue for large groups, corporate events, and family gatherings. Our Japanese Izakaya menu features top-rated Uni Udon and fresh Sushi. We are a family-friendly establishment and fully compliant with California's SB 1524 honest pricing regulations. Join us for the World Cup 2026 viewing parties!</p>
+  <div class="wrap" style="margin-top:18px;font-size:12px;line-height:1.8;color:var(--dim);letter-spacing:.4px">
+    Moxie Lounge &amp; Karaoke is a private karaoke lounge and Japanese restaurant in Arcadia, California, known for late-night sushi, yakitori, ramen, cocktails, and karaoke rooms for groups of all sizes.
   </div>
 
   <div class="wrap foot-legal">
