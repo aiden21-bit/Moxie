@@ -507,6 +507,55 @@
     font-size:12px;color:var(--dim);letter-spacing:.5px;
     background:rgba(232,121,249,.04);
   }
+  .order-panel{
+    max-width:920px;margin:0 auto;padding:34px;
+    border:1px solid var(--line);
+    background:
+      radial-gradient(420px 220px at 0% 0%,rgba(34,211,238,.08),transparent 70%),
+      radial-gradient(380px 220px at 100% 100%,rgba(245,158,11,.08),transparent 70%),
+      rgba(10,5,24,.82);
+  }
+  .order-grid{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:18px;margin-top:28px;
+  }
+  .order-card{
+    display:flex;flex-direction:column;justify-content:space-between;
+    min-height:220px;padding:24px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.02);
+    transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+  }
+  .order-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(34,211,238,.35);
+    box-shadow:0 16px 40px rgba(0,0,0,.24);
+  }
+  .order-badge{
+    display:inline-flex;align-items:center;
+    font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+    color:var(--cyan);margin-bottom:16px;
+  }
+  .order-name{
+    font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;
+    color:var(--ink);margin-bottom:10px;
+  }
+  .order-copy{
+    color:var(--dim);font-size:14px;line-height:1.65;
+  }
+  .order-link{
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-top:24px;padding:11px 18px;
+    border:1px solid var(--purple);
+    font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;
+    color:var(--ink);text-decoration:none;
+    background:rgba(139,92,246,.12);
+    transition:all .2s ease;
+  }
+  .order-link:hover{
+    color:var(--neon);border-color:var(--neon);
+    background:rgba(139,92,246,.18);box-shadow:0 0 18px rgba(139,92,246,.24);
+  }
 
   /* ── RESERVATIONS ── */
   .reserve-section{
@@ -623,6 +672,7 @@
     .rooms-grid{grid-template-columns:1fr}
     .menu-items{grid-template-columns:1fr}
     .menu-item:nth-child(odd){border-right:none}
+    .order-grid{grid-template-columns:1fr}
     .amen-list{grid-template-columns:1fr}
     section,.menu-page{padding:70px 18px 50px}
     .happy-banner{padding:30px}
@@ -865,6 +915,7 @@
       <div class="menu-tabs">
         <button class="menu-tab active" data-section="food">🍱 Food</button>
         <button class="menu-tab" data-section="drinks">🍶 Drinks</button>
+        <button class="menu-tab" data-section="order">Order Online</button>
       </div>
 
       <!-- ── FOOD ── -->
@@ -1147,6 +1198,44 @@
         </div>
 
       </div><!-- /msec-drinks -->
+
+      <div class="menu-section" id="msec-order">
+        <div class="order-panel reveal">
+          <div class="cat-title">Order Online</div>
+          <p style="color:var(--dim);max-width:640px;font-size:15px;line-height:1.7">
+            Pick your preferred pickup app and jump straight into Moxie's online ordering page.
+          </p>
+
+          <div class="order-grid">
+            <div class="order-card">
+              <div>
+                <span class="order-badge">Pickup App</span>
+                <div class="order-name">DoorDash</div>
+                <p class="order-copy">Browse the menu, place a pickup order, and check out through DoorDash.</p>
+              </div>
+              <a class="order-link" href="https://www.doordash.com/store/moxie-sushi-and-izakaya-restaurant-arcadia-1168305/1710136/?pickup=true&rwg_token=AFd1xnFz69u3JSXA-_xE7orFN3MpDE6NqTDULlmxABpV35PqhCOXV9hCFyhwP7v-qSugmeXtlHU2mjqg_Fb69PGecSX45PQ2AA==&utm_campaign=gpa" target="_blank" rel="noopener noreferrer">Order on DoorDash</a>
+            </div>
+
+            <div class="order-card">
+              <div>
+                <span class="order-badge">Pickup App</span>
+                <div class="order-name">Grubhub</div>
+                <p class="order-copy">Open Grubhub for pickup ordering and place your order from there.</p>
+              </div>
+              <a class="order-link" href="https://www.grubhub.com/restaurant/moxie-izakaya-restaurant-1205-s-baldwin-ave-arcadia/10720752?utm_source=google&utm_medium=organic&utm_campaign=place-action-link&pickup=true&rwg_token=AFd1xnEA3nhIH2mqh9oezC5KpQaAeLu55z0ENez409UFFSyUIVO26gnVWkFaKfckPEBngnQISzuHhgQJcdXZBQ-v6hIL7unnqA%3D%3D" target="_blank" rel="noopener noreferrer">Order on Grubhub</a>
+            </div>
+
+            <div class="order-card">
+              <div>
+                <span class="order-badge">Pickup App</span>
+                <div class="order-name">Uber Eats</div>
+                <p class="order-copy">Head to Uber Eats to place a pickup order for Moxie online.</p>
+              </div>
+              <a class="order-link" href="https://www.ubereats.com/store/moxie-izakaya-restaurant-los-angeles/b6QhUguIXA-MW_oVJl5-uA?diningMode=PICKUP&utm_campaign=CM2508147-search-free-nonbrand-google-pas_e_all_acq_Global&utm_medium=search-free-nonbrand&utm_source=google-pas&rwg_token=AFd1xnGc_kGYrDKuNAuYLw-ZpGSYYAj2t2uL_9NtYIxtFp2jkTqCW-7xkf60h9swS0eR0aDJasYit9T3SDDqdD-_4a19U6uDFQ%3D%3D" target="_blank" rel="noopener noreferrer">Order on Uber Eats</a>
+            </div>
+          </div>
+        </div>
+      </div><!-- /msec-order -->
 
     </div>
   </div>
