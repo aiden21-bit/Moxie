@@ -645,10 +645,6 @@
     from{transform:translate3d(0,0,0)}
     to{transform:translate3d(0,-50%,0)}
   }
-  /* reading beats motion: hovering the wall holds every column */
-  @media(hover:hover) and (pointer:fine){
-    .review-wall:hover .review-col{animation-play-state:paused}
-  }
   .review-card{
     margin-bottom:18px;
     padding:22px 22px 20px;
@@ -862,9 +858,6 @@
       <div class="reveal" style="text-align:center;margin-bottom:44px">
         <span class="eyebrow-tag">WHAT GUESTS SAY</span>
         <h2 class="section-title">Loved in <span class="accent">Arcadia.</span></h2>
-        <p class="section-lead" style="max-width:600px;margin-left:auto;margin-right:auto">
-          Nothing below 4.5 stars.
-        </p>
       </div>
       <div class="review-wall" id="reviewWall"></div>
       <p class="review-foot reveal">
@@ -1728,7 +1721,7 @@
     */
     const CFG = {
       SPACING:        1.06,
-      PLATES_TO_PASS:    5,   // plates that must cross the centre before the page frees up
+      PLATES_TO_PASS:    4,   // plates that must cross the centre before the page frees up
       // Base rate — RATE below scales it per device. Don't hand-tune per device here.
       STIFFNESS:      8.75,   // how hard pos is pulled to target — higher = snappier
       DAMPING:          6,    // ~2*sqrt(STIFFNESS) is critically damped; lower = springier
@@ -1747,10 +1740,11 @@
       // bonus on top of the gain, which is what kept the row whipping past.
       // 1900 asks for ~2.5 notches inside 120ms: a real flick, not a scroll.
       FLICK_SPEED:   1900,    // px/sec a wheel burst must reach to add momentum
-      MAX_LEAD:       1.6,    // plates the target may ever lead the row by, which is
-                              // what actually caps speed: the spring can only close
-                              // a fixed gap, so no flick outruns it. Normal scrolling
-                              // sits near 1.1 plates of lead, so only extremes clip.
+      LEAD_SOFT:      1.2,    // plates of lead at which a new notch counts for half.
+                              // Not a ceiling — a hard flick still travels further
+                              // than a gentle one — but the further the row is
+                              // already behind, the less each notch adds, so speed
+                              // builds instead of arriving all at once.
       HANDOFF_MS:    1400,    // ms of scripted scroll carrying the hero into the next section
       HANDOFF_PLATES:   1,    // plates the row slides across it, on that same curve
       TILT_PER_KPX:   2.4,    // degrees of lean per 1000 px/sec
@@ -1783,16 +1777,14 @@
     }
 
     /* Ground covered per scroll, which is what makes the row feel quick — the
-       spring only decides how it gets there. Dropping the gate from 8 plates to
-       5 buys the headroom to cut the gain back. With FLICK_SPEED no longer
-       topping up every notch, a notch moves the row 92px against an effective
-       ~180px before — half the pass-by speed, and a plate now takes about five
-       notches instead of under three. Touch is left alone: it was asking for
-       more, not less. This is the knob for "too fast" / "too slow"; the spring
-       only decides how each notch gets there. */
+       spring only decides how it gets there. A notch moves the row 155px, so a
+       plate takes about three notches and the whole gate about twelve. Touch is
+       left alone: it was asking for more, not less. This and PLATES_TO_PASS are
+       the two knobs for how long the hero holds you — gain for how fast the row
+       slides, the gate for how far it has to slide. */
     if (!coarse){
-      CFG.WHEEL_GAIN    = 1.30;
-      CFG.TRACKPAD_GAIN = 0.82;
+      CFG.WHEEL_GAIN    = 1.55;
+      CFG.TRACKPAD_GAIN = 0.98;
     }
     /* ════════════════════════════════════ */
 
@@ -1895,16 +1887,6 @@
         vel *= Math.pow(CFG.FRICTION, dt * 60);
       } else vel = 0;
 
-      // Speed ceiling. Clamping the input would make a hard scroll simply lose
-      // ground; clamping the lead instead lets the spring keep closing the gap
-      // at its own rate, so a violent flick reads as the row gliding at its top
-      // speed rather than as dropped input. Not during the handoff, which sets
-      // target from its own curve.
-      if (!handing){
-        const maxLead = SP * CFG.MAX_LEAD;
-        if (target - pos >  maxLead) target = pos + maxLead;
-        else if (target - pos < -maxLead) target = pos - maxLead;
-      }
 
       // Settle onto a plate once the gesture is over — but not while the gate is
       // running, and never mid-handoff, where a pull back onto the grid is
@@ -1964,7 +1946,12 @@
       if (!interacted){ interacted = true; hint.classList.add('gone'); }
       if (!inGesture){ gestureFrom = Math.round(pos / SP); inGesture = true; }
       snapTo = null;
-      target += px;
+      // Progressive resistance rather than a ceiling. The further the row is
+      // already running behind, the less a new notch adds — so speed builds
+      // over a few scrolls instead of landing all at once, and a hard flick
+      // still outruns a gentle one instead of being clipped to the same thing.
+      const lead = Math.abs(target - pos) / (SP * CFG.LEAD_SOFT);
+      target += px / (1 + lead * lead);
       lastInput = performance.now();
       kick();
     }
