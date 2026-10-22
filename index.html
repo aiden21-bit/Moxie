@@ -1766,14 +1766,14 @@
     }
 
     /* Ground covered per scroll, which is what makes the row feel quick — the
-       spring only decides how it gets there. A notch moves the row 155px, so a
-       plate takes about three notches and the whole gate about twelve. Touch is
-       left alone: it was asking for more, not less. This and PLATES_TO_PASS are
-       the two knobs for how long the hero holds you — gain for how fast the row
-       slides, the gate for how far it has to slide. */
+       spring only decides how it gets there. A notch moves the row 190px, so a
+       plate takes between two and three notches and the whole gate about nine.
+       Touch is left alone: it was asking for more, not less. This and
+       PLATES_TO_PASS are the two knobs for how long the hero holds you — gain
+       for how fast the row slides, the gate for how far it has to slide. */
     if (!coarse){
-      CFG.WHEEL_GAIN    = 1.55;
-      CFG.TRACKPAD_GAIN = 0.98;
+      CFG.WHEEL_GAIN    = 1.90;
+      CFG.TRACKPAD_GAIN = 1.20;
     }
     /* ════════════════════════════════════ */
 
