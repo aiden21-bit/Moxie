@@ -286,13 +286,15 @@
     opacity:var(--hero-fade,1);       /* fades, never shifts, so the logo stays put */
     min-height:calc(100vh - 70px);
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;padding:60px 24px;overflow:hidden;
+    /* heavier bottom padding lifts the logo off centre toward the top, so the
+       logo + plates read as one centred composition instead of sitting low */
+    text-align:center;padding:40px 24px 124px;overflow:hidden;
     isolation:isolate;
   }
   .hero-stage::before{
     content:"";
     position:absolute;
-    left:50%;top:50%;
+    left:50%;top:46%;                 /* follows the lifted content */
     width:min(92vw, 980px);
     height:min(78vh, 720px);
     transform:translate(-50%,-50%);
@@ -648,13 +650,13 @@
     content:"";
     position:absolute;inset:0;
     background:
-      radial-gradient(ellipse 44% 26% at 50% 38%, rgba(6,3,15,.66) 0%, rgba(6,3,15,.28) 58%, transparent 80%),
+      radial-gradient(ellipse 44% 26% at 50% 34%, rgba(6,3,15,.66) 0%, rgba(6,3,15,.28) 58%, transparent 80%),
       linear-gradient(to bottom, #000 0%, rgba(0,0,0,.4) 12%, transparent 30%, transparent 86%, rgba(0,0,0,.75) 100%);
     pointer-events:none;
     z-index:3;
   }
   .plate-track{
-    position:absolute;top:71%;left:0;
+    position:absolute;top:64%;left:0;  /* lifted with the hero content */
     height:var(--plate-h);
     will-change:transform;
     transform:translate3d(0,-50%,0);
@@ -682,9 +684,20 @@
     display:flex;flex-direction:column;align-items:center;gap:14px;
     z-index:4;pointer-events:none;
   }
+  /* a small arrow, not a word */
   .plate-hint{
-    font-family:'Bebas Neue',sans-serif;letter-spacing:4px;font-size:11px;
-    color:var(--dim);transition:opacity .5s ease;
+    width:22px;height:22px;color:var(--dim);
+    transition:opacity .5s ease;
+    animation:hintbob 2.6s ease-in-out infinite;
+  }
+  .plate-hint svg{
+    width:100%;height:100%;display:block;
+    fill:none;stroke:currentColor;stroke-width:1.6;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+  @keyframes hintbob{
+    0%,100%{transform:translateY(-3px)}
+    50%{transform:translateY(3px)}
   }
   .plate-hint.gone{opacity:0}
   .plate-skip{
@@ -717,6 +730,7 @@
     }
     nav.top ul.open{display:flex}
     .nav-toggle{display:block}
+    .hero-stage{padding:28px 18px 92px}   /* less room to give away on a phone */
     #about .grid,.happy-banner,.contact-grid{grid-template-columns:1fr}
     .rooms-grid{grid-template-columns:1fr}
     .menu-items{grid-template-columns:1fr}
@@ -1571,26 +1585,54 @@
     const CFG = {
       SPACING:        1.06,
       PLATES_TO_PASS:    8,   // plates that must cross the centre before the page frees up
-      // Halving STIFFNESS by 4x and DAMPING by 2x doubles the glide duration;
-      // speeds, gains and thresholds are halved alongside it.
+      // Base rate — RATE below scales it per device. Don't hand-tune per device here.
       STIFFNESS:      8.75,   // how hard pos is pulled to target — higher = snappier
       DAMPING:          6,    // ~2*sqrt(STIFFNESS) is critically damped; lower = springier
-      FRICTION:       0.962,  // decays half as fast per second, so glides run longer
+      FRICTION:       0.962,  // momentum decay per 60Hz-equivalent frame
       MAX_SPEED:       750,   // px/sec ceiling, stops a huge flick blurring past
       SNAP_STRENGTH:  0.019,
       SNAP_BELOW:      75,    // px/sec under which snapping engages
       SNAP_DELAY:     80,     // ms of quiet before it starts pulling
       SNAP_COMMIT:    0.18,   // move this fraction of a plate and it advances a full one
-      WHEEL_GAIN:     1.75,   // distance per scroll is unchanged; only the motion is slower
+      WHEEL_GAIN:     1.75,   // ground covered per scroll — NEVER scaled; see RATE below
       TRACKPAD_GAIN:  1.30,   // trackpad already carries OS momentum
       TOUCH_GAIN:     1.20,
       KEY_PLATES:     1,
       FLICK_SPEED:    375,    // px/sec a wheel burst must reach to add momentum
       UNLOCK_SPEED:    95,    // px/sec below which the rotation counts as finished
       UNLOCK_GRACE:   450,    // ms cap, so unlocking never stalls
+      UNLOCK_SETTLE:  380,    // ms of wheel swallowed after the handoff, so the tail of
+                              // the gesture that freed the page can't fling it
       TILT_PER_KPX:   2.4,    // degrees of lean per 1000 px/sec
       TILT_MAX:       6
     };
+
+    /* ─── per-device motion rate ───
+       The same gesture reads as too quick under a mouse and too sluggish under
+       a thumb, so the whole spring is scaled instead of being retuned twice:
+       desktop runs at half rate, touch a quarter faster. RATE is a frequency
+       multiplier, so STIFFNESS goes as RATE^2, DAMPING and the velocity
+       ceilings as RATE, durations as 1/RATE, and the per-frame decay factors
+       in the log domain — which keeps DAMPING ≈ 2*sqrt(STIFFNESS) at any rate.
+       The input gains are deliberately left alone: they set ground covered per
+       scroll, and scaling them quietly breaks the PLATES_TO_PASS gate.
+    */
+    const coarse = matchMedia('(hover: none) and (pointer: coarse)').matches ||
+                   innerWidth < 760;
+    const RATE   = coarse ? 1.25 : 0.5;
+    {
+      const r = RATE;
+      CFG.STIFFNESS    *= r * r;
+      CFG.DAMPING      *= r;
+      CFG.MAX_SPEED    *= r;
+      CFG.SNAP_BELOW   *= r;
+      CFG.UNLOCK_SPEED *= r;
+      CFG.SNAP_DELAY   /= r;
+      CFG.UNLOCK_GRACE /= r;
+      CFG.TILT_PER_KPX /= r;                                       // same lean at half the speed
+      CFG.FRICTION      = Math.pow(CFG.FRICTION, r);               // scale the time constant,
+      CFG.SNAP_STRENGTH = 1 - Math.pow(1 - CFG.SNAP_STRENGTH, r);  // not the per-frame step
+    }
     /* ════════════════════════════════════ */
 
     const PLATES = [
@@ -1622,7 +1664,9 @@
 
     const ui = document.createElement('div');
     ui.className = 'plate-ui';
-    ui.innerHTML = '<div class="plate-hint">SCROLL</div>' +
+    ui.innerHTML = '<div class="plate-hint" aria-hidden="true">' +
+                     '<svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></svg>' +
+                   '</div>' +
                    '<button class="plate-skip" type="button" hidden>SKIP</button>';
     wrap.appendChild(ui);
     const hint    = ui.querySelector('.plate-hint');
@@ -1646,7 +1690,7 @@
     let posVel = 0;                               // spring velocity of pos itself
     let dragging = false, raf = 0, started = false;
     let heroVisible = true, lastT = 0, lastInput = 0;
-    let locked = false, allSeen = false, wantUnlockAt = 0, interacted = false;
+    let locked = false, allSeen = false, wantUnlockAt = 0, interacted = false, unlockedAt = 0;
     let snapTo = null, gestureFrom = 0, inGesture = false;
     // Count plates crossing the centre rather than unique plates, so the gate is
     // "this many went by" and the row can loop more than once.
@@ -1771,6 +1815,10 @@
       if (reduced || !onHome()) return;
       if (!locked && !heroVisible) return;
       if (locked) e.preventDefault();            // the page must not move yet
+      else if (performance.now() - unlockedAt < CFG.UNLOCK_SETTLE){
+        e.preventDefault();                      // swallow the tail of the gesture that
+        return;                                  // just freed the page, then hand over
+      }
       const pad = isTrackpad(e);
       const px  = wheelPixels(e);
       // identical gain locked or not, so the gesture means the same thing either way
@@ -1854,8 +1902,10 @@
     function unlock(){
       if (!locked) return;
       locked = false;
+      unlockedAt = performance.now();
       // drop every bit of leftover motion so the handoff can't fling the page
       vel = 0; posVel = 0; target = pos;
+      dragging = false;                         // a finger still down belongs to the page now
       document.documentElement.classList.remove('plates-locked');
       skipBtn.hidden = true;
     }
@@ -1877,9 +1927,11 @@
     let exitRaf = 0, heroH = hero.offsetHeight || innerHeight;
     function paintExit(){
       exitRaf = 0;
-      const p = Math.min(1, Math.max(0, scrollY / (heroH * 0.9)));
-      const out = p * p;                       // holds near the top, then lets go
-      wrap.style.setProperty('--exit-shift', (p * 72).toFixed(1) + 'px');
+      // Run the handoff over more than the hero's own height, so it is still
+      // easing when the hero clears the viewport and never lands on a hard 1.
+      const p   = Math.min(1, Math.max(0, scrollY / (heroH * 1.35)));
+      const out = p * p * (3 - 2 * p);         // flat at both ends: no kick in, no cut out
+      wrap.style.setProperty('--exit-shift', (out * 104).toFixed(1) + 'px');
       wrap.style.setProperty('--exit-fade', (1 - out).toFixed(3));
       if (stage) stage.style.setProperty('--hero-fade', (1 - out * 0.95).toFixed(3));
     }
