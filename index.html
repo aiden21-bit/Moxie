@@ -848,7 +848,7 @@
       <div class="sub">Kitchen open <span>LATE</span> · Last orders 1:30 AM</div>
       <div class="cta">
         <a class="btn" data-page="reservations" style="cursor:pointer">🎤 Book a Room</a>
-        <a class="btn ghost" data-page="menu" style="cursor:pointer">View the Menu</a>
+        <a class="btn ghost" data-page="order" style="cursor:pointer">Order Online</a>
       </div>
     </div>
   </section>
@@ -2152,7 +2152,25 @@
 
     addEventListener('resize', () => { layout(); render(); restart(); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) restart(); });
-    addEventListener('pagechange', e => { if (e.detail === 'home') restart(); });
+    // The scroll lock lives on <html>, so it outlives the home page unless it is
+    // explicitly dropped. An armed gate — which is exactly what scrolling back to
+    // the top leaves behind — then pinned every other page at the top, with
+    // nothing on those pages able to release it. Each page's scrolling is now
+    // independent of whatever the hero was doing when it was left.
+    addEventListener('pagechange', e => {
+      if (e.detail !== 'home'){
+        handing = false;            // a handoff in flight must not drive another page
+        release();
+        return;
+      }
+      restart();
+      if (reduced) return;
+      // arriving back on home is a fresh run at the gate
+      travelled = 0; passes = 0; allSeen = false; leftHero = false;
+      vel = 0; posVel = 0; target = pos;
+      paintExit();                  // clear any fade left by the page just left
+      engage();
+    });
 
     // ── decode everything before the first frame, so nothing pops in ──
     // decode() can sit pending forever (a backgrounded tab never finishes one),
