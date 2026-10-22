@@ -626,7 +626,9 @@
   ════════════════════════ */
   .bg3d-wrap{
     pointer-events:none;              /* hero CTAs stay clickable */
-    position:fixed;inset:0;z-index:1;
+    /* absolute inside .hero (position:relative) so it scrolls away with the
+       hero rather than trailing the viewport down the page */
+    position:absolute;inset:0;z-index:0;
     display:none;
     background:#000;
     align-items:center;
@@ -737,11 +739,6 @@
 </head>
 <body>
 
-<!-- ── FIXED SUSHI PLATE CAROUSEL BACKGROUND ── -->
-<div class="bg3d-wrap visible" id="bg3dWrap">
-  <div class="plate-track" id="plateTrack"></div>
-</div>
-
 <nav class="top">
   <div class="logo-wrap" data-page="home">
     <img src="/logo-v2.png" alt="Moxie Lounge &amp; Karaoke" class="logo-img">
@@ -764,6 +761,10 @@
 <div class="page active" id="page-home">
 
   <section class="hero" id="home">
+    <!-- ── SUSHI PLATE CAROUSEL (inside the hero, so it scrolls away with it) ── -->
+    <div class="bg3d-wrap visible" id="bg3dWrap">
+      <div class="plate-track" id="plateTrack"></div>
+    </div>
     <div class="hero-stage" id="homeStage">
       <!-- 3D background objects — rotate on scroll -->
       <div class="hero-logo-wrap">
@@ -1629,6 +1630,7 @@
 
     // ── state ──
     let pos = 0, vel = 0, tilt = 0, padMode = false, padUntil = 0;
+    let heroVisible = true;
     let dragging = false, raf = 0, started = false;
     const seen = new Array(N).fill(false);
     let allSeen = false, locked = false, interacted = false;
@@ -1677,7 +1679,7 @@
       if (alive()) raf = requestAnimationFrame(frame);
     }
     function alive(){
-      if (document.hidden) return false;
+      if (document.hidden || !heroVisible) return false;   // nothing to draw once the hero scrolls off
       if (!document.getElementById('page-home').classList.contains('active')) return false;
       return Math.abs(vel) > 0.01 || Math.abs(tilt) > 0.01 || dragging ||
              Math.abs(pos - Math.round(pos / SP) * SP) > 0.4;
@@ -1765,9 +1767,7 @@
       }
     });
 
-    function inHero(){
-      return scrollY < innerHeight * 0.9;
-    }
+    function inHero(){ return heroVisible; }
 
     // ── scroll lock ──
     function lock(){
@@ -1788,6 +1788,15 @@
     skipBtn.addEventListener('click', () => { allSeen = true; seen.fill(true); dots.forEach(d => d.classList.add('seen')); unlock(); });
 
     // ── lifecycle ──
+    // stop burning frames while the hero is off screen, pick up again on return
+    const heroEl = document.getElementById('home');
+    if (window.IntersectionObserver && heroEl){
+      new IntersectionObserver(es => {
+        heroVisible = es[0].isIntersecting;
+        if (heroVisible) restart();
+      }, { threshold: 0 }).observe(heroEl);
+    }
+
     addEventListener('resize', () => { layout(); render(); restart(); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) restart(); });
     addEventListener('pagechange', e => { if (e.detail === 'home') restart(); });
