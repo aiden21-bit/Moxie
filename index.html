@@ -199,7 +199,10 @@
     --line:rgba(139,92,246,.2);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html{
+    scroll-behavior:smooth;
+    overscroll-behavior-y:none;       /* no rubber-band, no pull-to-refresh */
+  }
   body{
     background:#000;
     color:var(--ink);
@@ -704,7 +707,6 @@
   /* scroll lock while the plates are being shown */
   html.plates-locked,html.plates-locked body{
     overflow:hidden;
-    overscroll-behavior:none;
     touch-action:none;
     height:100%;
   }
@@ -1550,34 +1552,46 @@
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
   // ── SUSHI PLATE CAROUSEL (HOME HERO BACKGROUND) ──
+  // Input never moves the plates directly. It only moves `target`; a single rAF
+  // loop eases `pos` toward it, so a single wheel notch glides instead of
+  // stepping and reversing mid-glide retargets smoothly.
   (function(){
-    const wrap = document.getElementById('bg3dWrap');
+    const wrap  = document.getElementById('bg3dWrap');
     const track = document.getElementById('plateTrack');
-    if (!wrap || !track) return;
+    const hero  = document.getElementById('home');
+    if (!wrap || !track || !hero) return;
 
-    /* ─────────── TUNING — adjust feel here ───────────
-       spacing   plate pitch, as a multiple of plate width (plate gap)
-       wheelGain mouse-wheel notch → impulse        (speed)
-       padGain   trackpad delta → travel            (speed)
-       touchGain finger travel → travel             (speed)
-       friction  per-frame decay, higher = longer glide
-       maxSpeed  px/frame ceiling, stops wild flicks
+    /* ══════════════ TUNING ══════════════
+       STIFFNESS      how hard pos chases target — raise for snappier, lower for floatier
+       DAMPING        resistance; ~2*sqrt(STIFFNESS) settles with no overshoot
+       FRICTION       momentum decay — raise for a longer glide after a flick
+       SNAP_STRENGTH  pull toward the nearest plate once things go quiet
+       SPACING        plate pitch, as a multiple of plate width
+       *_GAIN         px of plate travel per unit of input, per device
+       Rates are per 60Hz-equivalent frame but applied dt-corrected, so 60Hz
+       and 120Hz settle over the same wall-clock time.
     */
     const CFG = {
-      spacing:   1.06,
-      wheelGain: 0.52,
-      padGain:   1.00,
-      touchGain: 1.25,
-      keyStep:   1.0,
-      friction:  0.940,
-      padFriction: 0.60,
-      maxSpeed:  44,
-      snapSpeed: 0.50,
-      snapEase:  0.10,
-      tilt:      0.20,
-      tiltMax:   7
+      SPACING:        1.06,
+      STIFFNESS:      140,    // how hard pos is pulled to target — higher = snappier
+      DAMPING:         24,    // ~2*sqrt(STIFFNESS) is critically damped; lower = springier
+      FRICTION:       0.925,
+      MAX_SPEED:      3000,   // px/sec ceiling, stops a huge flick blurring past
+      SNAP_STRENGTH:  0.075,
+      SNAP_BELOW:     300,    // px/sec under which snapping engages
+      SNAP_DELAY:     80,     // ms of quiet before it starts pulling
+      SNAP_COMMIT:    0.18,   // move this fraction of a plate and it advances a full one
+      WHEEL_GAIN:     1.75,   // one mouse notch ≈ 0.4 of a plate
+      TRACKPAD_GAIN:  1.30,   // trackpad already carries OS momentum
+      TOUCH_GAIN:     1.20,
+      KEY_PLATES:     1,
+      FLICK_SPEED:    1500,   // px/sec a wheel burst must reach to add momentum
+      UNLOCK_SPEED:   380,    // px/sec below which the rotation counts as finished
+      UNLOCK_GRACE:   450,    // ms cap, so unlocking never stalls
+      TILT_PER_KPX:   2.4,    // degrees of lean per 1000 px/sec
+      TILT_MAX:       6
     };
-    /* ─────────────────────────────────────────────── */
+    /* ════════════════════════════════════ */
 
     const PLATES = [
       ['/sushi/plate-1.webp', 'Dragon roll with avocado and eel sauce on a white plate'],
@@ -1589,6 +1603,9 @@
     const N = PLATES.length;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const LOCK_KEY = 'moxie-plates-seen';
+
+    // dt-corrected exponential easing: k is the per-60Hz-frame rate
+    const ease = (k, dt) => 1 - Math.pow(1 - k, dt * 60);
 
     // ── build ──
     const els = PLATES.map(([src, alt]) => {
@@ -1610,170 +1627,208 @@
                    '<div class="plate-hint">SCROLL</div>' +
                    '<button class="plate-skip" type="button" hidden>SKIP</button>';
     wrap.appendChild(ui);
-    const dots = [...ui.querySelectorAll('.plate-dots i')];
-    const hint = ui.querySelector('.plate-hint');
+    const dots    = [...ui.querySelectorAll('.plate-dots i')];
+    const hint    = ui.querySelector('.plate-hint');
     const skipBtn = ui.querySelector('.plate-skip');
 
     // ── layout ──
-    let plateW = 0, plateH = 0, SP = 0, cx = 0, total = 0;
+    let plateW = 0, SP = 0, cx = 0, span = 0;
     function layout(){
       const vw = innerWidth;
       plateW = Math.max(230, Math.min(vw * (vw < 760 ? 0.74 : 0.33), 470));
-      plateH = plateW * (430 / 560);
-      SP = plateW * CFG.spacing;
-      total = SP * N;
-      cx = vw / 2 - plateW / 2;
+      SP   = plateW * CFG.SPACING;
+      span = SP * N;
+      cx   = vw / 2 - plateW / 2;
       wrap.style.setProperty('--plate-w', plateW + 'px');
-      wrap.style.setProperty('--plate-h', plateH + 'px');
+      wrap.style.setProperty('--plate-h', (plateW * 430 / 560) + 'px');
     }
     layout();
 
     // ── state ──
-    let pos = 0, vel = 0, tilt = 0, padMode = false, padUntil = 0;
-    let heroVisible = true;
+    let pos = 0, target = 0, vel = 0, tilt = 0;   // vel is px/sec
+    let posVel = 0;                               // spring velocity of pos itself
     let dragging = false, raf = 0, started = false;
+    let heroVisible = true, lastT = 0, lastInput = 0;
+    let locked = false, allSeen = false, wantUnlockAt = 0, interacted = false;
+    let snapTo = null, gestureFrom = 0, inGesture = false;
     const seen = new Array(N).fill(false);
-    let allSeen = false, locked = false, interacted = false;
 
     function markSeen(i){
       if (seen[i]) return;
       seen[i] = true;
       dots[i].classList.add('seen');
-      if (seen.every(Boolean)){ allSeen = true; unlock(); }
+      if (seen.every(Boolean) && !allSeen){
+        allSeen = true;
+        wantUnlockAt = performance.now();   // settle first, then hand off
+      }
     }
 
     // ── render ──
-    const half = () => total / 2;
     function render(){
+      const half = span / 2;
       for (let i = 0; i < N; i++){
         let o = i * SP - pos;
-        o = ((o + half()) % total + total) % total - half();   // nearest wrap
+        o = ((o + half) % span + span) % span - half;     // nearest wrapped copy
         const d = Math.abs(o) / SP;
         const k = Math.min(d, 2);
-        const scale = 1.10 - 0.14 * k;
-        const op = Math.max(0.18, 1 - 0.42 * k);
         els[i].style.transform =
-          'translate3d(' + (cx + o).toFixed(2) + 'px,0,0) scale(' + scale.toFixed(3) + ') rotate(' + tilt.toFixed(2) + 'deg)';
-        els[i].style.opacity = op.toFixed(3);
+          'translate3d(' + (cx + o).toFixed(2) + 'px,0,0) scale(' +
+          (1.10 - 0.14 * k).toFixed(3) + ') rotate(' + tilt.toFixed(2) + 'deg)';
+        els[i].style.opacity = Math.max(0.18, 1 - 0.42 * k).toFixed(3);
         els[i].style.setProperty('--glow', String(Math.max(0, 1 - d / 0.8)));
-        if (d < 0.42) markSeen(i);
+        if (d < 0.35) markSeen(i);
       }
     }
 
-    function frame(){
+    // ── loop ──
+    function frame(now){
       raf = 0;
-      if (!dragging){
-        if (padMode && performance.now() > padUntil) padMode = false;
-        vel *= padMode ? CFG.padFriction : CFG.friction;
-        if (Math.abs(vel) < CFG.snapSpeed){
-          const target = Math.round(pos / SP) * SP;         // settle on a plate
-          pos += (target - pos) * CFG.snapEase;
-          if (Math.abs(vel) < 0.02 && Math.abs(target - pos) < 0.4){ pos = target; vel = 0; }
-        }
-      }
-      vel = Math.max(-CFG.maxSpeed, Math.min(CFG.maxSpeed, vel));
-      pos += vel;
-      const wantTilt = Math.max(-CFG.tiltMax, Math.min(CFG.tiltMax, -vel * CFG.tilt));
-      tilt += (wantTilt - tilt) * 0.12;
-      render();
-      if (alive()) raf = requestAnimationFrame(frame);
-    }
-    function alive(){
-      if (document.hidden || !heroVisible) return false;   // nothing to draw once the hero scrolls off
-      if (!document.getElementById('page-home').classList.contains('active')) return false;
-      return Math.abs(vel) > 0.01 || Math.abs(tilt) > 0.01 || dragging ||
-             Math.abs(pos - Math.round(pos / SP) * SP) > 0.4;
-    }
-    function kick(){ if (!raf && started) raf = requestAnimationFrame(frame); }
-    function restart(){                     // after a stall, drop the stale handle
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0; kick();
-    }
+      const dt = Math.min(0.05, (now - lastT) / 1000) || 0.016;   // clamp tab-switch gaps
+      lastT = now;
 
-    function push(delta, pad){
+      if (Math.abs(vel) > 1){
+        target += vel * dt;
+        vel *= Math.pow(CFG.FRICTION, dt * 60);
+      } else vel = 0;
+
+      // settle onto a plate once the gesture is over
+      if (!dragging && Math.abs(vel) < CFG.SNAP_BELOW && now - lastInput > CFG.SNAP_DELAY){
+        if (snapTo === null){
+          let n = Math.round(target / SP);
+          const moved = target - gestureFrom * SP;
+          if (inGesture && n === gestureFrom && Math.abs(moved) > SP * CFG.SNAP_COMMIT)
+            n = gestureFrom + Math.sign(moved);
+          snapTo = n * SP;
+          inGesture = false;
+        }
+        target += (snapTo - target) * ease(CFG.SNAP_STRENGTH, dt);
+      }
+
+      const prev = pos;
+      posVel += ((target - pos) * CFG.STIFFNESS - posVel * CFG.DAMPING) * dt;
+      pos += posVel * dt;
+
+      // lean into the direction of travel, measured from real motion
+      const speed = (pos - prev) / dt;
+      const want  = Math.max(-CFG.TILT_MAX, Math.min(CFG.TILT_MAX, -speed / 1000 * CFG.TILT_PER_KPX));
+      tilt += (want - tilt) * ease(0.12, dt);
+
+      render();
+
+      // hand off to the page only once the rotation has actually settled
+      if (locked && allSeen &&
+          (Math.abs(vel) < CFG.UNLOCK_SPEED || now - wantUnlockAt > CFG.UNLOCK_GRACE)) unlock();
+
+      if (awake()) raf = requestAnimationFrame(frame);
+    }
+    function awake(){
+      if (document.hidden || !heroVisible) return false;
+      if (!document.getElementById('page-home').classList.contains('active')) return false;
+      return dragging || Math.abs(vel) > 1 || Math.abs(posVel) > 1 ||
+             Math.abs(target - pos) > 0.3 || Math.abs(tilt) > 0.02 || (locked && allSeen);
+    }
+    function kick(){
+      if (raf || !started) return;
+      lastT = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+    function restart(){ if (raf) cancelAnimationFrame(raf); raf = 0; kick(); }
+
+    function nudge(px){
       if (reduced) return;
-      firstTouch();
-      if (pad){ padMode = true; padUntil = performance.now() + 140; vel = -delta * CFG.padGain; }
-      else { padMode = false; vel -= delta * CFG.wheelGain; }
+      if (!interacted){ interacted = true; hint.classList.add('gone'); }
+      if (!inGesture){ gestureFrom = Math.round(pos / SP); inGesture = true; }
+      snapTo = null;
+      target += px;
+      lastInput = performance.now();
       kick();
     }
-    function firstTouch(){
-      if (interacted) return;
-      interacted = true;
-      hint.classList.add('gone');
-    }
 
-    // ── input ──
-    // Mouse wheels fire coarse, repeating deltas; trackpads fire fine-grained,
-    // often fractional ones and already carry OS momentum — so trackpad deltas
-    // move the track directly and decay fast instead of getting our inertia too.
-    function isPad(e){
+    // ── input ───────────────────────────────────────────────
+    // Mouse wheels send coarse, repeating deltas; trackpads send fine-grained,
+    // often fractional ones that already carry OS momentum. Both only move the
+    // target — the loop does the smoothing — so the two feel the same.
+    function wheelPixels(e){
+      let d = e.deltaY;
+      if (e.deltaMode === 1) d *= 16;            // lines
+      else if (e.deltaMode === 2) d *= innerHeight;
+      return d;
+    }
+    function isTrackpad(e){
       if (e.deltaMode !== 0) return false;
       const d = Math.abs(e.deltaY);
-      if (d === 0) return true;
-      if (!Number.isInteger(d)) return true;
+      if (d === 0 || !Number.isInteger(d)) return true;
       if (d % 120 === 0 || d % 100 === 0) return false;
       return d < 50;
     }
+
+    let wheelBurst = 0, wheelBurstAt = 0;
     addEventListener('wheel', e => {
-      if (reduced) return;
-      const onHome = document.getElementById('page-home').classList.contains('active');
-      if (!onHome) return;
-      if (locked){ e.preventDefault(); push(e.deltaY, isPad(e)); return; }
-      if (inHero()) push(e.deltaY * 0.55, isPad(e));
+      if (reduced || !onHome()) return;
+      if (!locked && !heroVisible) return;
+      if (locked) e.preventDefault();            // the page must not move yet
+      const pad = isTrackpad(e);
+      const px  = wheelPixels(e);
+      // identical gain locked or not, so the gesture means the same thing either way
+      nudge(-px * (pad ? CFG.TRACKPAD_GAIN : CFG.WHEEL_GAIN));
+      // a fast burst on a real wheel earns a little glide; trackpads already have it
+      if (!pad){
+        const now = performance.now();
+        if (now - wheelBurstAt < 120) wheelBurst += Math.abs(px); else wheelBurst = Math.abs(px);
+        wheelBurstAt = now;
+        const speed = wheelBurst * 8;
+        if (speed > CFG.FLICK_SPEED){
+          vel = Math.max(-CFG.MAX_SPEED, Math.min(CFG.MAX_SPEED, -Math.sign(px) * speed));
+        }
+      }
     }, { passive: false });
 
-    let ty = 0, tvel = 0, tlast = 0;
+    let ty = 0, tvel = 0, tAt = 0;
     addEventListener('touchstart', e => {
-      if (reduced || !e.touches.length) return;
+      if (reduced || !onHome() || !e.touches.length) return;
+      if (!locked && !heroVisible) return;
       dragging = true; vel = 0; tvel = 0;
-      ty = e.touches[0].clientY; tlast = performance.now();
+      ty = e.touches[0].clientY; tAt = performance.now();
       kick();
     }, { passive: true });
     addEventListener('touchmove', e => {
       if (reduced || !dragging || !e.touches.length) return;
-      const y = e.touches[0].clientY, dy = ty - y;
-      ty = y;
-      const now = performance.now(), dt = Math.max(1, now - tlast); tlast = now;
       if (locked) e.preventDefault();
-      else if (!inHero()) { dragging = false; return; }
-      firstTouch();
-      pos -= dy * CFG.touchGain;
-      tvel = -dy * CFG.touchGain * (16 / dt);
-      kick();
+      const y = e.touches[0].clientY;
+      const dy = ty - y; ty = y;
+      const now = performance.now(), dt = Math.max(8, now - tAt); tAt = now;
+      nudge(-dy * CFG.TOUCH_GAIN);
+      tvel = -dy * CFG.TOUCH_GAIN / (dt / 1000);
     }, { passive: false });
     addEventListener('touchend', () => {
       if (!dragging) return;
-      dragging = false; padMode = false;
-      vel = Math.max(-CFG.maxSpeed, Math.min(CFG.maxSpeed, tvel));
+      dragging = false;
+      vel = Math.max(-CFG.MAX_SPEED, Math.min(CFG.MAX_SPEED, tvel));
+      lastInput = performance.now();
       kick();
     }, { passive: true });
 
     addEventListener('keydown', e => {
-      if (reduced) return;
-      if (!document.getElementById('page-home').classList.contains('active')) return;
+      if (reduced || !onHome()) return;
       const t = e.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
       let dir = 0;
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') dir = 1;
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') dir = -1;
       if (!dir) return;
-      if (locked || inHero()){
-        if (locked) e.preventDefault();
-        firstTouch();
-        padMode = false;
-        vel -= dir * SP * CFG.keyStep * 0.09;
-        kick();
-      }
-    });
+      if (!locked && !heroVisible) return;
+      if (locked) e.preventDefault();
+      vel = 0;
+      nudge(-dir * SP * CFG.KEY_PLATES);          // exactly one plate, then it glides
+    }, { passive: false });
 
-    function inHero(){ return heroVisible; }
+    function onHome(){ return document.getElementById('page-home').classList.contains('active'); }
 
     // ── scroll lock ──
     function lock(){
       if (reduced || locked || allSeen) return;
       try { if (sessionStorage.getItem(LOCK_KEY)) return; } catch(e){}
-      if (scrollY > 4) return;                    // refreshed or restored mid-page
+      if (scrollY > 4) return;                    // loaded already scrolled: leave it alone
       locked = true;
       document.documentElement.classList.add('plates-locked');
       skipBtn.hidden = false;
@@ -1781,37 +1836,52 @@
     function unlock(){
       if (!locked) return;
       locked = false;
+      // drop every bit of leftover motion so the handoff can't fling the page
+      vel = 0; posVel = 0; target = pos;
       document.documentElement.classList.remove('plates-locked');
       skipBtn.hidden = true;
       try { sessionStorage.setItem(LOCK_KEY, '1'); } catch(e){}
     }
-    skipBtn.addEventListener('click', () => { allSeen = true; seen.fill(true); dots.forEach(d => d.classList.add('seen')); unlock(); });
+    skipBtn.addEventListener('click', () => {
+      allSeen = true; seen.fill(true);
+      dots.forEach(d => d.classList.add('seen'));
+      unlock();
+    });
 
     // ── lifecycle ──
-    // stop burning frames while the hero is off screen, pick up again on return
-    const heroEl = document.getElementById('home');
-    if (window.IntersectionObserver && heroEl){
+    if (window.IntersectionObserver){
       new IntersectionObserver(es => {
         heroVisible = es[0].isIntersecting;
         if (heroVisible) restart();
-      }, { threshold: 0 }).observe(heroEl);
+      }, { threshold: 0 }).observe(hero);
     }
-
     addEventListener('resize', () => { layout(); render(); restart(); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) restart(); });
     addEventListener('pagechange', e => { if (e.detail === 'home') restart(); });
-    addEventListener('scroll', () => { if (!locked && inHero()) kick(); }, { passive: true });
 
-    // ── preload, then start ──
-    const dpr = devicePixelRatio > 1.3 ? '@2x' : '';
-    Promise.all(PLATES.map(([src]) => new Promise(res => {
-      const im = new Image();
-      im.onload = im.onerror = res;
-      im.src = dpr ? src.replace('.webp', '@2x.webp') : src;
-    }))).then(() => {
+    // ── decode everything before the first frame, so nothing pops in ──
+    // decode() can sit pending forever (a backgrounded tab never finishes one),
+    // and `load` does not fire again on an already-complete image — so every
+    // path here resolves, and a timeout guarantees the hero is never held up.
+    function ready(img){
+      return new Promise(res => {
+        let settled = false;
+        const done = () => { if (!settled){ settled = true; res(); } };
+        setTimeout(done, 2500);
+        if (img.complete && img.naturalWidth > 0){
+          if (img.decode) img.decode().then(done, done); else done();
+          return;
+        }
+        img.addEventListener('load', () => {
+          if (img.decode) img.decode().then(done, done); else done();
+        }, { once: true });
+        img.addEventListener('error', done, { once: true });
+      });
+    }
+    Promise.all(els.map(el => ready(el.querySelector('img')))).then(() => {
       started = true;
       render();
-      if (reduced){ hint.remove(); return; }
+      if (reduced){ hint.remove(); return; }      // static row, no lock, no loop
       lock();
       kick();
     });
