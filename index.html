@@ -678,13 +678,6 @@
     display:flex;flex-direction:column;align-items:center;gap:14px;
     z-index:4;pointer-events:none;
   }
-  .plate-dots{display:flex;gap:9px}
-  .plate-dots i{
-    width:7px;height:7px;border-radius:50%;
-    background:rgba(237,233,255,.26);
-    transition:background .3s ease,transform .3s ease;
-  }
-  .plate-dots i.seen{background:var(--purple);transform:scale(1.3)}
   .plate-hint{
     font-family:'Bebas Neue',sans-serif;letter-spacing:4px;font-size:11px;
     color:var(--dim);transition:opacity .5s ease;
@@ -1583,10 +1576,10 @@
       SNAP_STRENGTH:  0.038,
       SNAP_BELOW:     150,    // px/sec under which snapping engages
       SNAP_DELAY:     80,     // ms of quiet before it starts pulling
-      SNAP_COMMIT:    0.08,   // move this fraction of a plate and it advances a full one
-      WHEEL_GAIN:     0.875,  // one mouse notch still lands exactly one plate
-      TRACKPAD_GAIN:  0.65,   // trackpad already carries OS momentum
-      TOUCH_GAIN:     0.60,
+      SNAP_COMMIT:    0.18,   // move this fraction of a plate and it advances a full one
+      WHEEL_GAIN:     1.75,   // distance per scroll is unchanged; only the motion is slower
+      TRACKPAD_GAIN:  1.30,   // trackpad already carries OS momentum
+      TOUCH_GAIN:     1.20,
       KEY_PLATES:     1,
       FLICK_SPEED:    750,    // px/sec a wheel burst must reach to add momentum
       UNLOCK_SPEED:   190,    // px/sec below which the rotation counts as finished
@@ -1605,7 +1598,6 @@
     ];
     const N = PLATES.length;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const LOCK_KEY = 'moxie-plates-seen';
 
     // dt-corrected exponential easing: k is the per-60Hz-frame rate
     const ease = (k, dt) => 1 - Math.pow(1 - k, dt * 60);
@@ -1626,11 +1618,9 @@
 
     const ui = document.createElement('div');
     ui.className = 'plate-ui';
-    ui.innerHTML = '<div class="plate-dots">' + '<i></i>'.repeat(CFG.PLATES_TO_PASS) + '</div>' +
-                   '<div class="plate-hint">SCROLL</div>' +
+    ui.innerHTML = '<div class="plate-hint">SCROLL</div>' +
                    '<button class="plate-skip" type="button" hidden>SKIP</button>';
     wrap.appendChild(ui);
-    const dots    = [...ui.querySelectorAll('.plate-dots i')];
     const hint    = ui.querySelector('.plate-hint');
     const skipBtn = ui.querySelector('.plate-skip');
 
@@ -1657,15 +1647,15 @@
     // Count plates crossing the centre rather than unique plates, so the gate is
     // "this many went by" and the row can loop more than once.
     const atCentre = new Array(N).fill(false);
-    let passes = 0, primed = false;
+    let passes = 0, primed = false, moveDir = 0;
 
     function centreTick(i, centred){
       if (centred === atCentre[i]) return;
       atCentre[i] = centred;
       if (!centred || !primed) return;          // count on entry only
+      if (moveDir >= 0) return;                 // scrolling down only; going back up doesn't count
       if (passes >= CFG.PLATES_TO_PASS) return;
       passes++;
-      if (dots[passes - 1]) dots[passes - 1].classList.add('seen');
       if (passes >= CFG.PLATES_TO_PASS && !allSeen){
         allSeen = true;
         wantUnlockAt = performance.now();       // settle first, then hand off
@@ -1716,6 +1706,7 @@
       const prev = pos;
       posVel += ((target - pos) * CFG.STIFFNESS - posVel * CFG.DAMPING) * dt;
       pos += posVel * dt;
+      if (pos !== prev) moveDir = pos < prev ? -1 : 1;   // -1 is scrolling down
 
       // lean into the direction of travel, measured from real motion
       const speed = (pos - prev) / dt;
@@ -1837,13 +1828,24 @@
     function onHome(){ return document.getElementById('page-home').classList.contains('active'); }
 
     // ── scroll lock ──
-    function lock(){
-      if (reduced || locked || allSeen) return;
-      try { if (sessionStorage.getItem(LOCK_KEY)) return; } catch(e){}
-      if (scrollY > 4) return;                    // loaded already scrolled: leave it alone
+    function engage(){
       locked = true;
       document.documentElement.classList.add('plates-locked');
       skipBtn.hidden = false;
+      hint.classList.remove('gone');
+      kick();
+    }
+    function lock(){
+      if (reduced || locked || allSeen) return;
+      if (scrollY > 4) return;                    // loaded already scrolled: leave it alone
+      engage();
+    }
+    // Returning to the very top starts the count over, so the next trip down
+    // has to earn its way past the plates again.
+    function resetGate(){
+      if (reduced || locked) return;
+      passes = 0; allSeen = false; wantUnlockAt = 0;
+      engage();
     }
     function unlock(){
       if (!locked) return;
@@ -1852,11 +1854,9 @@
       vel = 0; posVel = 0; target = pos;
       document.documentElement.classList.remove('plates-locked');
       skipBtn.hidden = true;
-      try { sessionStorage.setItem(LOCK_KEY, '1'); } catch(e){}
     }
     skipBtn.addEventListener('click', () => {
       allSeen = true; passes = CFG.PLATES_TO_PASS;
-      dots.forEach(d => d.classList.add('seen'));
       unlock();
     });
 
@@ -1867,6 +1867,14 @@
         if (heroVisible) restart();
       }, { threshold: 0 }).observe(hero);
     }
+    let leftHero = false;
+    addEventListener('scroll', () => {
+      if (reduced || locked || !onHome()) return;
+      // floor the distance so an odd innerHeight can't collapse the threshold
+      if (scrollY > Math.max(240, innerHeight * 0.6)) leftHero = true;   // genuinely moved on
+      else if (leftHero && scrollY <= 2){ leftHero = false; resetGate(); }
+    }, { passive: true });
+
     addEventListener('resize', () => { layout(); render(); restart(); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) restart(); });
     addEventListener('pagechange', e => { if (e.detail === 'home') restart(); });
