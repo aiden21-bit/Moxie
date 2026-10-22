@@ -686,17 +686,6 @@
   @media(max-width:560px){
     .review-wall{grid-template-columns:1fr;height:460px}
   }
-  /* Motion is the whole point of the wall, so with it off the wall simply
-     becomes a readable, scrollable list rather than disappearing. */
-  @media(prefers-reduced-motion:reduce){
-    .review-col{animation:none}
-    .review-wall{
-      height:auto;max-height:620px;overflow-y:auto;
-      -webkit-mask-image:none;mask-image:none;
-    }
-    .review-group:nth-child(2){display:none}   /* the loop copy, not a column */
-  }
-
   /* ── REVEAL ── */
   .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
   .reveal.in{opacity:1;transform:none}
@@ -774,11 +763,6 @@
     50%{transform:translateY(3px)}
   }
   .plate-hint.gone{opacity:0}
-  @media(prefers-reduced-motion:reduce){
-    .plate-ui{display:none}
-    .plate{transition:none!important}
-  }
-
   /* scroll lock while the plates are being shown */
   html.plates-locked,html.plates-locked body{
     overflow:hidden;
@@ -1801,7 +1785,12 @@
       ['/sushi/plate-5.webp', 'Sashimi selection of salmon, tuna and yellowtail on a white plate']
     ];
     const N = PLATES.length;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // A reduced-motion preference now turns off scroll hijacking and the hero's
+    // positional drift — never the animation itself. Windows flips this flag from
+    // Visual effects / "adjust for best performance", which is a performance
+    // setting rather than an accessibility choice, so treating it as a global
+    // kill switch left whole machines looking at a dead page.
+    const noHijack = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // dt-corrected exponential easing: k is the per-60Hz-frame rate
     const ease = (k, dt) => 1 - Math.pow(1 - k, dt * 60);
@@ -1947,7 +1936,6 @@
     function restart(){ if (raf) cancelAnimationFrame(raf); raf = 0; kick(); }
 
     function nudge(px){
-      if (reduced) return;
       if (!interacted){ interacted = true; hint.classList.add('gone'); }
       if (!inGesture){ gestureFrom = Math.round(pos / SP); inGesture = true; }
       snapTo = null;
@@ -1981,7 +1969,7 @@
 
     let wheelBurst = 0, wheelBurstAt = 0, wheelBurstDir = 0;
     addEventListener('wheel', e => {
-      if (reduced || !onHome()) return;
+      if (!onHome()) return;
       if (!locked && !heroVisible) return;
       if (locked) e.preventDefault();            // the page must not move yet
       else if (handing){ e.preventDefault(); return; }   // the handoff is driving
@@ -2006,14 +1994,14 @@
 
     let ty = 0, tvel = 0, tAt = 0;
     addEventListener('touchstart', e => {
-      if (reduced || !onHome() || !e.touches.length) return;
+      if (!onHome() || !e.touches.length) return;
       if (!locked && !heroVisible) return;
       dragging = true; vel = 0; tvel = 0;
       ty = e.touches[0].clientY; tAt = performance.now();
       kick();
     }, { passive: true });
     addEventListener('touchmove', e => {
-      if (reduced || !dragging || !e.touches.length) return;
+      if (!dragging || !e.touches.length) return;
       if (locked || handing) e.preventDefault();
       const y = e.touches[0].clientY;
       const dy = ty - y; ty = y;
@@ -2030,7 +2018,7 @@
     }, { passive: true });
 
     addEventListener('keydown', e => {
-      if (reduced || !onHome()) return;
+      if (!onHome()) return;
       const t = e.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
       let dir = 0;
@@ -2054,14 +2042,14 @@
       kick();
     }
     function lock(){
-      if (reduced || locked || allSeen) return;
+      if (noHijack || locked || allSeen) return;
       if (scrollY > 4) return;                    // loaded already scrolled: leave it alone
       engage();
     }
     // Returning to the very top starts the count over, so the next trip down
     // has to earn its way past the plates again.
     function resetGate(){
-      if (reduced || locked || handing) return;
+      if (noHijack || locked || handing) return;
       travelled = 0; passes = 0; allSeen = false;
       engage();
     }
@@ -2136,19 +2124,17 @@
       // easing when the hero clears the viewport and never lands on a hard 1.
       const p   = Math.min(1, Math.max(0, scrollY / (heroH * 1.35)));
       const out = p * p * (3 - 2 * p);         // flat at both ends: no kick in, no cut out
-      wrap.style.setProperty('--exit-shift', (out * 104).toFixed(1) + 'px');
+      wrap.style.setProperty('--exit-shift', (noHijack ? 0 : out * 104).toFixed(1) + 'px');
       wrap.style.setProperty('--exit-fade', (1 - out).toFixed(3));
       if (stage) stage.style.setProperty('--hero-fade', (1 - out * 0.95).toFixed(3));
     }
-    if (!reduced){
-      addEventListener('scroll', () => { if (!exitRaf) exitRaf = requestAnimationFrame(paintExit); }, { passive: true });
-      addEventListener('resize', () => { heroH = hero.offsetHeight || innerHeight; paintExit(); });
-      paintExit();
-    }
+    addEventListener('scroll', () => { if (!exitRaf) exitRaf = requestAnimationFrame(paintExit); }, { passive: true });
+    addEventListener('resize', () => { heroH = hero.offsetHeight || innerHeight; paintExit(); });
+    paintExit();
 
     let leftHero = false;
     addEventListener('scroll', () => {
-      if (reduced || locked || !onHome()) return;
+      if (noHijack || locked || !onHome()) return;
       // floor the distance so an odd innerHeight can't collapse the threshold
       if (scrollY > Math.max(240, innerHeight * 0.6)) leftHero = true;   // genuinely moved on
       else if (leftHero && scrollY <= 2){ leftHero = false; resetGate(); }
@@ -2168,7 +2154,7 @@
         return;
       }
       restart();
-      if (reduced) return;
+      if (noHijack) return;
       // arriving back on home is a fresh run at the gate
       travelled = 0; passes = 0; allSeen = false; leftHero = false;
       vel = 0; posVel = 0; target = pos;
@@ -2198,8 +2184,7 @@
     Promise.all(els.map(el => ready(el.querySelector('img')))).then(() => {
       started = true;
       render();
-      if (reduced){ hint.remove(); return; }      // static row, no lock, no loop
-      lock();
+      if (!noHijack) lock();   // the row animates either way; only the gate is opt-out
       kick();
     });
   })();
