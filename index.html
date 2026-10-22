@@ -623,6 +623,79 @@
   .foot-legal a{color:var(--dim);text-decoration:none;margin-right:14px}
   .foot-legal a:hover{color:var(--cyan)}
 
+  /* ── REVIEW WALL ──
+     Three columns rising at their own pace. Constant motion, so: linear, CSS
+     keyframes (they run off the main thread and never need interrupting), and
+     transform only. Each column holds the same set twice and travels exactly
+     -50%, which is why the cards carry margin instead of the column carrying
+     gap — a flex gap would put half a gap of drift at the loop seam. */
+  .review-wall{
+    --fade:88px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+    height:min(76vh,600px);overflow:hidden;
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent 100%);
+    mask-image:linear-gradient(to bottom,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent 100%);
+  }
+  .review-col{
+    will-change:transform;
+    animation:reviewrise var(--dur,56s) linear infinite;
+    animation-delay:var(--delay,0s);
+  }
+  @keyframes reviewrise{
+    from{transform:translate3d(0,0,0)}
+    to{transform:translate3d(0,-50%,0)}
+  }
+  /* reading beats motion: hovering the wall holds every column */
+  @media(hover:hover) and (pointer:fine){
+    .review-wall:hover .review-col{animation-play-state:paused}
+  }
+  .review-card{
+    margin-bottom:18px;
+    padding:22px 22px 20px;
+    border:1px solid var(--line);
+    background:rgba(14,8,37,.55);
+    border-radius:3px;
+    transition:border-color 200ms cubic-bezier(.23,1,.32,1);
+  }
+  @media(hover:hover) and (pointer:fine){
+    .review-card:hover{border-color:var(--purple)}
+  }
+  .review-card.lg .review-text{font-size:16px;line-height:1.62}
+  .review-stars{
+    color:var(--neon);font-size:12px;letter-spacing:3px;margin-bottom:12px;
+  }
+  .review-text{
+    font-size:14px;line-height:1.7;color:rgba(237,233,255,.9);margin:0 0 16px;
+  }
+  .review-who{
+    display:flex;align-items:baseline;gap:8px;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  }
+  .review-name{color:var(--ink);font-weight:700}
+  .review-src{color:var(--dim)}
+  .review-foot{text-align:center;margin-top:36px}
+  .review-foot a{
+    color:var(--neon);text-decoration:none;font-size:12px;
+    letter-spacing:3px;text-transform:uppercase;font-weight:700;
+    border-bottom:1px solid var(--purple);padding-bottom:3px;
+  }
+  @media(max-width:900px){
+    .review-wall{grid-template-columns:repeat(2,1fr);height:min(70vh,520px)}
+  }
+  @media(max-width:560px){
+    .review-wall{grid-template-columns:1fr;height:460px}
+  }
+  /* Motion is the whole point of the wall, so with it off the wall simply
+     becomes a readable, scrollable list rather than disappearing. */
+  @media(prefers-reduced-motion:reduce){
+    .review-col{animation:none}
+    .review-wall{
+      height:auto;max-height:620px;overflow-y:auto;
+      -webkit-mask-image:none;mask-image:none;
+    }
+    .review-group:nth-child(2){display:none}   /* the loop copy, not a column */
+  }
+
   /* ── REVEAL ── */
   .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
   .reveal.in{opacity:1;transform:none}
@@ -700,15 +773,6 @@
     50%{transform:translateY(3px)}
   }
   .plate-hint.gone{opacity:0}
-  .plate-skip{
-    pointer-events:auto;
-    background:none;border:1px solid var(--line);color:var(--dim);
-    font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:11px;
-    padding:6px 16px;cursor:pointer;transition:color .2s,border-color .2s;
-  }
-  .plate-skip:hover,.plate-skip:focus-visible{color:var(--ink);border-color:var(--purple)}
-  .plate-skip[hidden]{display:none}
-
   @media(prefers-reduced-motion:reduce){
     .plate-ui{display:none}
     .plate{transition:none!important}
@@ -759,6 +823,7 @@
   <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
   <ul id="navlinks">
     <li><a data-page="home">Home</a></li>
+    <li><a data-page="about">About</a></li>
     <li><a data-page="happy-hour">Happy Hour</a></li>
     <li><a data-page="rooms">Room Rates</a></li>
     <li><a data-page="menu">Menu</a></li>
@@ -792,36 +857,19 @@
   </section>
 
 
-  <section id="about">
+  <section id="reviews">
     <div class="wrap">
-      <div class="grid">
-        <div class="reveal">
-          <span class="eyebrow-tag">OUR PASSION</span>
-          <h2 class="section-title">More than <span class="accent">just karaoke.</span></h2>
-          <p class="section-lead">
-            We are more than just a karaoke venue — we are also a Japanese restaurant
-            specializing in sushi and grills. A spacious dining area and private rooms
-            of various sizes make Moxie the perfect spot for small gatherings, dining,
-            or private parties of up to 50 people.
-          </p>
-          <div class="about-card">
-            <h3>An exciting &amp; joyful karaoke experience</h3>
-            <p>We cater to all preferences — whether you're enjoying a drink or embracing the new wave of sober culture. A more welcoming and balanced environment for everyone.</p>
-            <p>An ideal spot for family gatherings, where guests of all ages can enjoy an unforgettable experience under the neon.</p>
-            <ul class="amen-list">
-              <li>Large Private Rooms</li>
-              <li>Dining Room</li>
-              <li>Karaoke Rooms</li>
-              <li>Lounge Area</li>
-            </ul>
-          </div>
-        </div>
-        <div class="reveal">
-          <div class="venue-photo-wrap" style="aspect-ratio:4/3">
-            <img src="/moxie dining area.webp" alt="Moxie dining area" class="venue-photo" loading="lazy">
-          </div>
-        </div>
+      <div class="reveal" style="text-align:center;margin-bottom:44px">
+        <span class="eyebrow-tag">WHAT GUESTS SAY</span>
+        <h2 class="section-title">Loved in <span class="accent">Arcadia.</span></h2>
+        <p class="section-lead" style="max-width:600px;margin-left:auto;margin-right:auto">
+          Nothing below 4.5 stars.
+        </p>
       </div>
+      <div class="review-wall" id="reviewWall"></div>
+      <p class="review-foot reveal">
+        <a data-page="about" style="cursor:pointer">More about Moxie →</a>
+      </p>
     </div>
   </section>
 
@@ -1393,6 +1441,44 @@
 <!-- ════════════════════════════════
      PAGE: ACCESSIBILITY STATEMENT
 ════════════════════════════════ -->
+<!-- ════════════════════════════════
+     PAGE: ABOUT US
+════════════════════════════════ -->
+<div class="page" id="page-about">
+  <section>
+    <div class="wrap">
+      <div class="grid">
+        <div class="reveal">
+          <span class="eyebrow-tag">OUR PASSION</span>
+          <h2 class="section-title">More than <span class="accent">just karaoke.</span></h2>
+          <p class="section-lead">
+            We are more than just a karaoke venue — we are also a Japanese restaurant
+            specializing in sushi and grills. A spacious dining area and private rooms
+            of various sizes make Moxie the perfect spot for small gatherings, dining,
+            or private parties of up to 50 people.
+          </p>
+          <div class="about-card">
+            <h3>An exciting &amp; joyful karaoke experience</h3>
+            <p>We cater to all preferences — whether you're enjoying a drink or embracing the new wave of sober culture. A more welcoming and balanced environment for everyone.</p>
+            <p>An ideal spot for family gatherings, where guests of all ages can enjoy an unforgettable experience under the neon.</p>
+            <ul class="amen-list">
+              <li>Large Private Rooms</li>
+              <li>Dining Room</li>
+              <li>Karaoke Rooms</li>
+              <li>Lounge Area</li>
+            </ul>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="venue-photo-wrap" style="aspect-ratio:4/3">
+            <img src="/moxie dining area.webp" alt="Moxie dining area" class="venue-photo" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
 <div class="page" id="page-accessibility">
   <section style="padding:90px 24px">
     <div class="wrap" style="max-width:700px">
@@ -1556,6 +1642,64 @@
   });
 
 
+  // ── REVIEW WALL ──
+  // Verbatim excerpts from the Yelp listing, every one of them a 5-star review
+  // (Amy L.'s 4-star is deliberately absent). Names are as the reviewers
+  // published them. The >= 4.5 filter below is enforced in code, so dropping a
+  // lower-rated review in here simply won't render it.
+  (function(){
+    const wall = document.getElementById('reviewWall');
+    if (!wall) return;
+
+    const REVIEWS = [
+      { stars:5, name:'T C.', text:'Moxie has ruined me for all other karaoke spots in SoCal and I have zero reasons to stray elsewhere.' },
+      { stars:5, name:'Cassie T.', text:'We entered into this arcade-like setting with small claw machines, a cotton candy maker, darts, an open bar, a dining area with televisions and an open karaoke mix, and a separate hall for reserved karaoke rooms!' },
+      { stars:5, name:'Mody M.', text:'Server was pleasant and accommodating. Place is beautiful with private rooms for karaoke with friends.' },
+      { stars:5, name:'Kristie H.', text:"I'm genuinely not a karaoke person (I can't hold a tune!), but I had SO much fun at MOXIE!" },
+      { stars:5, name:'Hannah L.', text:"I didn't know what to expect, but this place ended up being one of my favorite karaoke experiences!! Modern, clean rooms and restrooms, and reasonable cost." },
+      { stars:5, name:'Jan V.', text:'My little one loved singing all her fave Taylor Swift songs — and they have all the songs available!' },
+      { stars:5, name:'Fiona T.', text:"Can't believe I found such a fun and delicious spot in L.A.!!! Moxie Karaoke is not your standard karaoke spot." },
+      { stars:5, name:'Ashley C.', text:'Basically was able to find any song we wanted to sing and we had a group with diverse music taste! Def want to come here again!' },
+      { stars:5, name:'Clara C.', text:'I came here to celebrate a friend’s birthday, and I enjoyed my experience! We had a large room with about ten people.' }
+    ].filter(r => r.stars >= 4.5);
+
+    if (!REVIEWS.length){ wall.remove(); return; }
+
+    const stars = n => '★'.repeat(Math.floor(n)) + (n % 1 ? '½' : '');
+    const card = r => {
+      const el = document.createElement('article');
+      // longer quotes get the bigger type, which is what varies the card sizes
+      el.className = 'review-card' + (r.text.length > 150 ? ' lg' : '');
+      el.innerHTML =
+        '<div class="review-stars" aria-label="' + r.stars + ' out of 5 stars">' + stars(r.stars) + '</div>' +
+        '<p class="review-text"></p>' +
+        '<div class="review-who"><span class="review-name"></span><span class="review-src">Yelp</span></div>';
+      el.querySelector('.review-text').textContent = '“' + r.text + '”';
+      el.querySelector('.review-name').textContent = r.name;
+      return el;
+    };
+
+    // deal round-robin so neighbouring columns don't end up the same length
+    const COLS = innerWidth < 560 ? 1 : innerWidth < 900 ? 2 : 3;
+    const DUR  = [56, 72, 46];
+    for (let c = 0; c < COLS; c++){
+      const col = document.createElement('div');
+      col.className = 'review-col';
+      col.style.setProperty('--dur', (DUR[c % DUR.length]) + 's');
+      col.style.setProperty('--delay', (-c * 7) + 's');   // break the lock-step
+      const mine = REVIEWS.filter((_, i) => i % COLS === c);
+      // two identical groups: the -50% travel lands the copy exactly on the original
+      for (let g = 0; g < 2; g++){
+        const group = document.createElement('div');
+        group.className = 'review-group';
+        group.setAttribute('aria-hidden', g ? 'true' : 'false');
+        mine.forEach(r => group.appendChild(card(r)));
+        col.appendChild(group);
+      }
+      wall.appendChild(col);
+    }
+  })();
+
   // ── SCROLL REVEAL ──
   const io = new IntersectionObserver(es => {
     es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
@@ -1603,6 +1747,10 @@
       // bonus on top of the gain, which is what kept the row whipping past.
       // 1900 asks for ~2.5 notches inside 120ms: a real flick, not a scroll.
       FLICK_SPEED:   1900,    // px/sec a wheel burst must reach to add momentum
+      MAX_LEAD:       1.6,    // plates the target may ever lead the row by, which is
+                              // what actually caps speed: the spring can only close
+                              // a fixed gap, so no flick outruns it. Normal scrolling
+                              // sits near 1.1 plates of lead, so only extremes clip.
       HANDOFF_MS:    1400,    // ms of scripted scroll carrying the hero into the next section
       HANDOFF_PLATES:   1,    // plates the row slides across it, on that same curve
       TILT_PER_KPX:   2.4,    // degrees of lean per 1000 px/sec
@@ -1637,12 +1785,14 @@
     /* Ground covered per scroll, which is what makes the row feel quick — the
        spring only decides how it gets there. Dropping the gate from 8 plates to
        5 buys the headroom to cut the gain back. With FLICK_SPEED no longer
-       topping up every notch, a notch now moves the row 115px against an
-       effective ~180px before: a plate takes about four notches instead of
-       under three. Touch is left alone — it was asking for more, not less. */
+       topping up every notch, a notch moves the row 92px against an effective
+       ~180px before — half the pass-by speed, and a plate now takes about five
+       notches instead of under three. Touch is left alone: it was asking for
+       more, not less. This is the knob for "too fast" / "too slow"; the spring
+       only decides how each notch gets there. */
     if (!coarse){
-      CFG.WHEEL_GAIN    = 1.15;
-      CFG.TRACKPAD_GAIN = 0.72;
+      CFG.WHEEL_GAIN    = 1.30;
+      CFG.TRACKPAD_GAIN = 0.82;
     }
     /* ════════════════════════════════════ */
 
@@ -1677,11 +1827,9 @@
     ui.className = 'plate-ui';
     ui.innerHTML = '<div class="plate-hint" aria-hidden="true">' +
                      '<svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></svg>' +
-                   '</div>' +
-                   '<button class="plate-skip" type="button" hidden>SKIP</button>';
+                   '</div>';
     wrap.appendChild(ui);
-    const hint    = ui.querySelector('.plate-hint');
-    const skipBtn = ui.querySelector('.plate-skip');
+    const hint = ui.querySelector('.plate-hint');
 
     // ── layout ──
     let plateW = 0, SP = 0, cx = 0, span = 0;
@@ -1705,18 +1853,18 @@
     let handing = false, handFrom = 0, handTo = 0, handAt = 0;
     let handRowFrom = 0, handRowTo = 0;
     let snapTo = null, gestureFrom = 0, inGesture = false;
-    // Count plates crossing the centre rather than unique plates, so the gate is
-    // "this many went by" and the row can loop more than once.
-    const atCentre = new Array(N).fill(false);
-    let passes = 0, primed = false, moveDir = 0;
+    // The gate is "this much row has gone by", measured as net downward travel:
+    // one plate-width of travel is one plate past the centre, and the row can
+    // loop more than once. Counting plates as they crossed the centre instead
+    // meant a momentary backward blip — the snap tugging target back a few px —
+    // flipped moveDir and swallowed that crossing, leaving the gate a plate
+    // short with no motion left to finish it. Going back up still doesn't count.
+    let travelled = 0, passes = 0, moveDir = 0;
 
-    function centreTick(i, centred){
-      if (centred === atCentre[i]) return;
-      atCentre[i] = centred;
-      if (!centred || !primed) return;          // count on entry only
-      if (moveDir >= 0) return;                 // scrolling down only; going back up doesn't count
-      if (passes >= CFG.PLATES_TO_PASS) return;
-      passes++;
+    function gateTick(prev){
+      if (allSeen || pos >= prev) return;       // downward is pos decreasing
+      travelled += prev - pos;
+      passes = Math.floor(travelled / SP);
       if (passes >= CFG.PLATES_TO_PASS) allSeen = true;
     }
 
@@ -1733,7 +1881,6 @@
           (1.10 - 0.14 * k).toFixed(3) + ') rotate(' + tilt.toFixed(2) + 'deg)';
         els[i].style.opacity = Math.max(0.18, 1 - 0.42 * k).toFixed(3);
         els[i].style.setProperty('--glow', String(Math.max(0, 1 - d / 0.8)));
-        centreTick(i, d < 0.35);
       }
     }
 
@@ -1748,9 +1895,26 @@
         vel *= Math.pow(CFG.FRICTION, dt * 60);
       } else vel = 0;
 
-      // settle onto a plate once the gesture is over — but never mid-handoff,
-      // where a pull back onto the grid is exactly the yank we're avoiding
-      if (!dragging && !handing && Math.abs(vel) < CFG.SNAP_BELOW && now - lastInput > CFG.SNAP_DELAY){
+      // Speed ceiling. Clamping the input would make a hard scroll simply lose
+      // ground; clamping the lead instead lets the spring keep closing the gap
+      // at its own rate, so a violent flick reads as the row gliding at its top
+      // speed rather than as dropped input. Not during the handoff, which sets
+      // target from its own curve.
+      if (!handing){
+        const maxLead = SP * CFG.MAX_LEAD;
+        if (target - pos >  maxLead) target = pos + maxLead;
+        else if (target - pos < -maxLead) target = pos - maxLead;
+      }
+
+      // Settle onto a plate once the gesture is over — but not while the gate is
+      // running, and never mid-handoff, where a pull back onto the grid is
+      // exactly the yank we're avoiding. The grid assumes one gesture is worth
+      // about one plate: at this gain a notch is a fifth of one, so snapping
+      // either committed a whole plate (making every paused notch jump, which no
+      // gain would slow) or dragged the notch straight back. Off, the row just
+      // follows the scroll — continuous, and the same speed however you scroll.
+      if (!dragging && !handing && !locked &&
+          Math.abs(vel) < CFG.SNAP_BELOW && now - lastInput > CFG.SNAP_DELAY){
         if (snapTo === null){
           let n = Math.round(target / SP);
           const moved = target - gestureFrom * SP;
@@ -1766,6 +1930,7 @@
       posVel += ((target - pos) * CFG.STIFFNESS - posVel * CFG.DAMPING) * dt;
       pos += posVel * dt;
       if (pos !== prev) moveDir = pos < prev ? -1 : 1;   // -1 is scrolling down
+      gateTick(prev);
 
       // lean into the direction of travel, measured from real motion
       const speed = (pos - prev) / dt;
@@ -1893,7 +2058,6 @@
     function engage(){
       locked = true;
       document.documentElement.classList.add('plates-locked');
-      skipBtn.hidden = false;
       hint.classList.remove('gone');
       kick();
     }
@@ -1906,14 +2070,20 @@
     // has to earn its way past the plates again.
     function resetGate(){
       if (reduced || locked || handing) return;
-      passes = 0; allSeen = false;
+      travelled = 0; passes = 0; allSeen = false;
       engage();
     }
     function release(){
       locked = false;
       dragging = false;                         // a finger still down belongs to the page now
       document.documentElement.classList.remove('plates-locked');
-      skipBtn.hidden = true;
+    }
+    // The visible SKIP button is gone, but holding someone's scroll with no way
+    // out isn't acceptable, so Escape still releases the gate.
+    function skipGate(){
+      if (!locked) return;
+      allSeen = true; passes = CFG.PLATES_TO_PASS; travelled = passes * SP;
+      release();
     }
     // The gate is met, so stop asking the user to push and carry them across.
     // One curve drives both the page scroll and the row, so the plates are still
@@ -1931,10 +2101,11 @@
       const dir = moveDir > 0 ? 1 : -1;
       handRowFrom = target;
       handRowTo   = (Math.round(handRowFrom / SP) + dir * CFG.HANDOFF_PLATES) * SP;
-      const about = document.getElementById('about');
+      // whatever section follows the hero, so renaming it can't break the landing
+      const next = hero.nextElementSibling;
       handFrom = scrollY;
-      handTo   = about ? Math.max(0, about.getBoundingClientRect().top + scrollY - 70)
-                       : hero.offsetHeight;
+      handTo   = next ? Math.max(0, next.getBoundingClientRect().top + scrollY - 70)
+                      : hero.offsetHeight;
       handAt   = performance.now();
       kick();
       stepHandoff();
@@ -1952,9 +2123,8 @@
       if (t < 1) requestAnimationFrame(stepHandoff);
       else handing = false;
     }
-    skipBtn.addEventListener('click', () => {
-      allSeen = true; passes = CFG.PLATES_TO_PASS;
-      release();
+    addEventListener('keydown', e => {
+      if (e.key === 'Escape' && locked){ e.preventDefault(); skipGate(); }
     });
 
     // ── lifecycle ──
@@ -2017,8 +2187,7 @@
     }
     Promise.all(els.map(el => ready(el.querySelector('img')))).then(() => {
       started = true;
-      render();                 // seeds atCentre
-      primed = true;            // so the plate already centred isn't counted
+      render();
       if (reduced){ hint.remove(); return; }      // static row, no lock, no loop
       lock();
       kick();
