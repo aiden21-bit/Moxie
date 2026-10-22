@@ -1584,7 +1584,7 @@
     */
     const CFG = {
       SPACING:        1.06,
-      PLATES_TO_PASS:    8,   // plates that must cross the centre before the page frees up
+      PLATES_TO_PASS:    5,   // plates that must cross the centre before the page frees up
       // Base rate — RATE below scales it per device. Don't hand-tune per device here.
       STIFFNESS:      8.75,   // how hard pos is pulled to target — higher = snappier
       DAMPING:          6,    // ~2*sqrt(STIFFNESS) is critically damped; lower = springier
@@ -1598,11 +1598,13 @@
       TRACKPAD_GAIN:  1.30,   // trackpad already carries OS momentum
       TOUCH_GAIN:     1.20,
       KEY_PLATES:     1,
-      FLICK_SPEED:    375,    // px/sec a wheel burst must reach to add momentum
-      UNLOCK_SPEED:    95,    // px/sec below which the rotation counts as finished
-      UNLOCK_GRACE:   450,    // ms cap, so unlocking never stalls
-      UNLOCK_SETTLE:  380,    // ms of wheel swallowed after the handoff, so the tail of
-                              // the gesture that freed the page can't fling it
+      // A burst is |px| summed over 120ms, times 8 — so one ordinary 100px notch
+      // scores 800. Anything near that handed every single notch a momentum
+      // bonus on top of the gain, which is what kept the row whipping past.
+      // 1900 asks for ~2.5 notches inside 120ms: a real flick, not a scroll.
+      FLICK_SPEED:   1900,    // px/sec a wheel burst must reach to add momentum
+      HANDOFF_MS:    1400,    // ms of scripted scroll carrying the hero into the next section
+      HANDOFF_PLATES:   1,    // plates the row slides across it, on that same curve
       TILT_PER_KPX:   2.4,    // degrees of lean per 1000 px/sec
       TILT_MAX:       6
     };
@@ -1622,16 +1624,25 @@
     const RATE   = coarse ? 1.25 : 0.5;
     {
       const r = RATE;
-      CFG.STIFFNESS    *= r * r;
-      CFG.DAMPING      *= r;
-      CFG.MAX_SPEED    *= r;
-      CFG.SNAP_BELOW   *= r;
-      CFG.UNLOCK_SPEED *= r;
-      CFG.SNAP_DELAY   /= r;
-      CFG.UNLOCK_GRACE /= r;
-      CFG.TILT_PER_KPX /= r;                                       // same lean at half the speed
-      CFG.FRICTION      = Math.pow(CFG.FRICTION, r);               // scale the time constant,
-      CFG.SNAP_STRENGTH = 1 - Math.pow(1 - CFG.SNAP_STRENGTH, r);  // not the per-frame step
+      CFG.STIFFNESS     *= r * r;
+      CFG.DAMPING       *= r;
+      CFG.MAX_SPEED     *= r;
+      CFG.SNAP_BELOW    *= r;
+      CFG.SNAP_DELAY    /= r;
+      CFG.TILT_PER_KPX  /= r;                                       // same lean at half the speed
+      CFG.FRICTION       = Math.pow(CFG.FRICTION, r);               // scale the time constant,
+      CFG.SNAP_STRENGTH  = 1 - Math.pow(1 - CFG.SNAP_STRENGTH, r);  // not the per-frame step
+    }
+
+    /* Ground covered per scroll, which is what makes the row feel quick — the
+       spring only decides how it gets there. Dropping the gate from 8 plates to
+       5 buys the headroom to cut the gain back. With FLICK_SPEED no longer
+       topping up every notch, a notch now moves the row 115px against an
+       effective ~180px before: a plate takes about four notches instead of
+       under three. Touch is left alone — it was asking for more, not less. */
+    if (!coarse){
+      CFG.WHEEL_GAIN    = 1.15;
+      CFG.TRACKPAD_GAIN = 0.72;
     }
     /* ════════════════════════════════════ */
 
@@ -1690,7 +1701,9 @@
     let posVel = 0;                               // spring velocity of pos itself
     let dragging = false, raf = 0, started = false;
     let heroVisible = true, lastT = 0, lastInput = 0;
-    let locked = false, allSeen = false, wantUnlockAt = 0, interacted = false, unlockedAt = 0;
+    let locked = false, allSeen = false, interacted = false;
+    let handing = false, handFrom = 0, handTo = 0, handAt = 0;
+    let handRowFrom = 0, handRowTo = 0;
     let snapTo = null, gestureFrom = 0, inGesture = false;
     // Count plates crossing the centre rather than unique plates, so the gate is
     // "this many went by" and the row can loop more than once.
@@ -1704,10 +1717,7 @@
       if (moveDir >= 0) return;                 // scrolling down only; going back up doesn't count
       if (passes >= CFG.PLATES_TO_PASS) return;
       passes++;
-      if (passes >= CFG.PLATES_TO_PASS && !allSeen){
-        allSeen = true;
-        wantUnlockAt = performance.now();       // settle first, then hand off
-      }
+      if (passes >= CFG.PLATES_TO_PASS) allSeen = true;
     }
 
     // ── render ──
@@ -1738,8 +1748,9 @@
         vel *= Math.pow(CFG.FRICTION, dt * 60);
       } else vel = 0;
 
-      // settle onto a plate once the gesture is over
-      if (!dragging && Math.abs(vel) < CFG.SNAP_BELOW && now - lastInput > CFG.SNAP_DELAY){
+      // settle onto a plate once the gesture is over — but never mid-handoff,
+      // where a pull back onto the grid is exactly the yank we're avoiding
+      if (!dragging && !handing && Math.abs(vel) < CFG.SNAP_BELOW && now - lastInput > CFG.SNAP_DELAY){
         if (snapTo === null){
           let n = Math.round(target / SP);
           const moved = target - gestureFrom * SP;
@@ -1763,16 +1774,17 @@
 
       render();
 
-      // hand off to the page only once the rotation has actually settled
-      if (locked && allSeen &&
-          (Math.abs(vel) < CFG.UNLOCK_SPEED || now - wantUnlockAt > CFG.UNLOCK_GRACE)) unlock();
+      // Hand off the moment the gate is met. Waiting for the row to settle first
+      // is precisely what read as a dead stop: the plates braked, then the page
+      // moved. Now the two overlap.
+      if (locked && allSeen) beginHandoff();
 
       if (awake()) raf = requestAnimationFrame(frame);
     }
     function awake(){
       if (document.hidden || !heroVisible) return false;
       if (!document.getElementById('page-home').classList.contains('active')) return false;
-      return dragging || Math.abs(vel) > 1 || Math.abs(posVel) > 1 ||
+      return dragging || handing || Math.abs(vel) > 1 || Math.abs(posVel) > 1 ||
              Math.abs(target - pos) > 0.3 || Math.abs(tilt) > 0.02 || (locked && allSeen);
     }
     function kick(){
@@ -1815,10 +1827,7 @@
       if (reduced || !onHome()) return;
       if (!locked && !heroVisible) return;
       if (locked) e.preventDefault();            // the page must not move yet
-      else if (performance.now() - unlockedAt < CFG.UNLOCK_SETTLE){
-        e.preventDefault();                      // swallow the tail of the gesture that
-        return;                                  // just freed the page, then hand over
-      }
+      else if (handing){ e.preventDefault(); return; }   // the handoff is driving
       const pad = isTrackpad(e);
       const px  = wheelPixels(e);
       // identical gain locked or not, so the gesture means the same thing either way
@@ -1848,7 +1857,7 @@
     }, { passive: true });
     addEventListener('touchmove', e => {
       if (reduced || !dragging || !e.touches.length) return;
-      if (locked) e.preventDefault();
+      if (locked || handing) e.preventDefault();
       const y = e.touches[0].clientY;
       const dy = ty - y; ty = y;
       const now = performance.now(), dt = Math.max(8, now - tAt); tAt = now;
@@ -1871,6 +1880,7 @@
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') dir = 1;
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') dir = -1;
       if (!dir) return;
+      if (handing){ e.preventDefault(); return; }   // the handoff is driving
       if (!locked && !heroVisible) return;
       if (locked) e.preventDefault();
       vel = 0;
@@ -1895,23 +1905,56 @@
     // Returning to the very top starts the count over, so the next trip down
     // has to earn its way past the plates again.
     function resetGate(){
-      if (reduced || locked) return;
-      passes = 0; allSeen = false; wantUnlockAt = 0;
+      if (reduced || locked || handing) return;
+      passes = 0; allSeen = false;
       engage();
     }
-    function unlock(){
-      if (!locked) return;
+    function release(){
       locked = false;
-      unlockedAt = performance.now();
-      // drop every bit of leftover motion so the handoff can't fling the page
-      vel = 0; posVel = 0; target = pos;
       dragging = false;                         // a finger still down belongs to the page now
       document.documentElement.classList.remove('plates-locked');
       skipBtn.hidden = true;
     }
+    // The gate is met, so stop asking the user to push and carry them across.
+    // One curve drives both the page scroll and the row, so the plates are still
+    // sliding as the next section arrives and the two come to rest together —
+    // leaving the row to coast on friction instead just stops it early. Input is
+    // absorbed throughout, so the tail of the gesture that earned the handoff
+    // can't fling the page.
+    function beginHandoff(){
+      if (handing || !locked) return;
+      release();
+      handing = true;
+      vel = 0;                                  // the curve owns the row now, not momentum
+      snapTo = null; inGesture = false;
+      // land on a plate boundary, so coming back up finds the row aligned
+      const dir = moveDir > 0 ? 1 : -1;
+      handRowFrom = target;
+      handRowTo   = (Math.round(handRowFrom / SP) + dir * CFG.HANDOFF_PLATES) * SP;
+      const about = document.getElementById('about');
+      handFrom = scrollY;
+      handTo   = about ? Math.max(0, about.getBoundingClientRect().top + scrollY - 70)
+                       : hero.offsetHeight;
+      handAt   = performance.now();
+      kick();
+      stepHandoff();
+    }
+    function stepHandoff(){
+      if (!handing) return;
+      const t = Math.min(1, (performance.now() - handAt) / CFG.HANDOFF_MS);
+      // ease-in-out cubic: leaves and arrives at zero speed, so neither end clicks
+      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      target = handRowFrom + (handRowTo - handRowFrom) * e;
+      // 'instant' because html{scroll-behavior:smooth} would otherwise animate
+      // every one of these frames against us
+      scrollTo({ top: handFrom + (handTo - handFrom) * e, behavior: 'instant' });
+      kick();
+      if (t < 1) requestAnimationFrame(stepHandoff);
+      else handing = false;
+    }
     skipBtn.addEventListener('click', () => {
       allSeen = true; passes = CFG.PLATES_TO_PASS;
-      unlock();
+      release();
     });
 
     // ── lifecycle ──
