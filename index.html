@@ -416,7 +416,8 @@
   .section-lead{max-width:720px;color:var(--dim);font-size:16px;margin-bottom:44px}
 
   /* ── ABOUT ── */
-  #about .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
+  /* the two-up copy + photo layout, which now lives on the About page */
+  #page-about .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
   .about-card{
     padding:38px;border:1px solid var(--line);
     background:rgba(139,92,246,.07);
@@ -791,7 +792,7 @@
     nav.top ul.open{display:flex}
     .nav-toggle{display:block}
     .hero-stage{padding:28px 18px 92px}   /* less room to give away on a phone */
-    #about .grid,.happy-banner,.contact-grid{grid-template-columns:1fr}
+    #page-about .grid,.happy-banner,.contact-grid{grid-template-columns:1fr}
     .rooms-grid{grid-template-columns:1fr}
     .menu-items{grid-template-columns:1fr}
     .menu-item:nth-child(odd){border-right:none}
