@@ -812,7 +812,7 @@
     <li><a data-page="happy-hour">Happy Hour</a></li>
     <li><a data-page="rooms">Room Rates</a></li>
     <li><a data-page="menu">Menu</a></li>
-    <li><a data-page="order">Order</a></li>
+    <li><a href="https://www.smorefood.com/cr1dchd1/moxie-izakaya-restaurant-and-karaoke-arcadia-91007/order-online?utm_source=gmb&amp;utm_medium=order_link" target="_blank" rel="noopener">Order</a></li>
     <li><a data-page="reservations">Reservations</a></li>
     <li><a data-page="faq">FAQ</a></li>
   </ul>
@@ -836,7 +836,7 @@
       <div class="sub">Kitchen open <span>LATE</span> · Last orders 1:30 AM</div>
       <div class="cta">
         <a class="btn" data-page="reservations" style="cursor:pointer">Book a Room</a>
-        <a class="btn ghost" data-page="order" style="cursor:pointer">Order Online</a>
+        <a class="btn ghost" href="https://www.smorefood.com/cr1dchd1/moxie-izakaya-restaurant-and-karaoke-arcadia-91007/order-online?utm_source=gmb&amp;utm_medium=order_link" target="_blank" rel="noopener">Order Online</a>
       </div>
     </div>
   </section>
@@ -1268,26 +1268,6 @@
 <!-- ════════════════════════════════
      PAGE: ORDER
 ════════════════════════════════ -->
-<div class="page" id="page-order">
-  <div style="width:100%;padding-top:8px;background:rgba(14,8,37,.6);border-bottom:1px solid var(--line)">
-    <iframe
-      src="https://www.smorefood.com/cr1dchd1/moxie-izakaya-restaurant-and-karaoke-arcadia-91007/order-online?utm_source=gmb&amp;utm_medium=order_link"
-      title="Order online from Moxie Izakaya Restaurant &amp; Karaoke"
-      style="width:100%;height:800px;border:none;display:block"
-      loading="lazy"
-      allow="payment"
-    ></iframe>
-  </div>
-  <section style="padding:40px 24px 60px">
-    <div class="wrap" style="text-align:center">
-      <p style="color:var(--dim);font-size:13px;letter-spacing:1px">
-        Trouble with the form? <a href="https://www.smorefood.com/cr1dchd1/moxie-izakaya-restaurant-and-karaoke-arcadia-91007/order-online?utm_source=gmb&amp;utm_medium=order_link" target="_blank" rel="noopener" style="color:var(--neon);text-decoration:none;border-bottom:1px solid var(--purple)">Open it in a new tab</a>
-        or call <a href="tel:6265258889" style="color:var(--neon);text-decoration:none;border-bottom:1px solid var(--purple)">626-525-8889</a>
-      </p>
-    </div>
-  </section>
-</div>
-
 <!-- ════════════════════════════════
      PAGE: RESERVATIONS
 ════════════════════════════════ -->
@@ -2205,38 +2185,15 @@
   document.body.classList.add('home-page');
   document.getElementById('bg3dWrap').classList.add('visible');
 
-  // ── ORDER PAGE DEEP LINK ──
-  // The Order page mirrors the Smore ordering link in the address bar:
-  //   moxiekaraoke.com/https://www.smorefood.com/.../order-online?utm_source=...&utm_medium=...
-  // vercel.json rewrites unknown paths to index.html, so reloading or sharing
-  // that URL serves the site instead of a 404.
-  const ORDER_PATH  = '/https://www.smorefood.com/cr1dchd1/moxie-izakaya-restaurant-and-karaoke-arcadia-91007/order-online';
-  const ORDER_QUERY = '?utm_source=gmb&utm_medium=order_link';
-  const ORDER_URL   = ORDER_PATH + ORDER_QUERY;
-
-  // Proxies may collapse the '//' after 'https:', so accept either form on the way in.
-  const isOrderPath = p => /^\/https:\/{1,2}www\.smorefood\.com\//i.test(p);
-
-  const _urlGoToPage = window.goToPage;
-  window.goToPage = function(name, keepUrl) {
-    _urlGoToPage.call(this, name);
-    if (keepUrl) return;
-    const target = (name === 'order') ? ORDER_URL : '/';
-    if (location.pathname + location.search === target) return;
-    // pushState throws on file:// — navigation still works, the URL just won't track.
-    try { history.pushState({ page: name }, '', target); } catch (e) {}
-  };
-
-  window.addEventListener('popstate', e => {
-    const name = (e.state && e.state.page) || (isOrderPath(location.pathname) ? 'order' : 'home');
-    window.goToPage(name, true);
-  });
-
-  // Landing straight on the Order URL (reload, bookmark, shared link)
-  if (isOrderPath(location.pathname)) {
-    window.goToPage('order', true);
-    // Restore the full form if the host collapsed the double slash.
-    try { history.replaceState({ page: 'order' }, '', ORDER_URL); } catch (e) {}
+  // ── LEGACY ORDER LINKS ──
+  // The Order tab used to be an embedded page whose address mirrored the Smore
+  // ordering link. The embed is gone — Smore's cart needs its own cookies, which
+  // a cross-site iframe doesn't get, so adding an item failed — but those
+  // mirrored URLs are out there in listings and shared messages, so forward them
+  // to the real ordering site rather than dropping anyone on the home page.
+  // Proxies may collapse the '//' after 'https:', so accept either form.
+  if (/^\/https:\/{1,2}www\.smorefood\.com\//i.test(location.pathname)) {
+    location.replace('https://www.smorefood.com/cr1dchd1/moxie-izakaya-restaurant-and-karaoke-arcadia-91007/order-online?utm_source=gmb&utm_medium=order_link');
   }
 </script>
 
